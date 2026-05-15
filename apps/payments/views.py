@@ -31,16 +31,21 @@ def payment_select(request):
 @login_required
 def payment_list(request):
     from django.db import models as db_models
+    from apps.towers.models import Tower
     q = request.GET.get('q', '').strip()
     status_filter = request.GET.get('status', '')
     period_filter = request.GET.get('period', '').strip()
+    tower_filter = request.GET.get('tower', '').strip()
     all_periods = Payment.objects.order_by('-period').values_list('period', flat=True).distinct()
+    towers = Tower.objects.order_by('number')
     qs = Payment.objects.select_related('apartment__tower', 'resident__user')
 
     if status_filter:
         qs = qs.filter(status=status_filter)
     if period_filter:
         qs = qs.filter(period=period_filter)
+    if tower_filter:
+        qs = qs.filter(apartment__tower_id=tower_filter)
 
     if q:
         matched_statuses = [k for k, v in Payment.STATUS_CHOICES if q.lower() in v.lower() or q.lower() in k.lower()]
@@ -59,7 +64,11 @@ def payment_list(request):
             q_filter |= db_models.Q(payment_type__in=matched_types)
         qs = qs.filter(q_filter)
 
-    count_qs = Payment.objects.filter(period=period_filter) if period_filter else Payment.objects
+    count_qs = Payment.objects
+    if period_filter:
+        count_qs = count_qs.filter(period=period_filter)
+    if tower_filter:
+        count_qs = count_qs.filter(apartment__tower_id=tower_filter)
     counts = {s: count_qs.filter(status=s).count() for s, _ in Payment.STATUS_CHOICES}
 
     resident = getattr(request.user, 'resident', None)
@@ -74,7 +83,9 @@ def payment_list(request):
         'counts': counts,
         'status_filter': status_filter,
         'period_filter': period_filter,
+        'tower_filter': tower_filter,
         'all_periods': all_periods,
+        'towers': towers,
         'q': q,
     })
 

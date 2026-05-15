@@ -17,11 +17,6 @@
     <i class="ti ti-edit me-2"></i>Editar
   </a>
   {% endif %}
-  {% if request.user.is_superuser %}
-  <a href="{% url 'units:delete' apartment.pk %}" class="btn btn-danger ms-2">
-    <i class="ti ti-trash me-2"></i>Eliminar
-  </a>
-  {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -70,6 +65,50 @@
         {% endif %}
       </div>
     </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header"><h3 class="card-title">Pagos</h3></div>
+  <div class="card-body p-0">
+    {% if payments %}
+    <div class="table-responsive">
+      <table class="table table-vcenter table-hover card-table">
+        <thead>
+          <tr>
+            <th>Periodo</th><th>Tipo</th><th>Monto</th><th>Vencimiento</th><th>Estado</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for payment in payments %}
+          <tr style="cursor:pointer" onclick="if(!event.target.closest('a,button')){window.location.href='{% url 'payments:detail' payment.pk %}'}">
+            <td>{{ payment.period }}</td>
+            <td>{{ payment.get_payment_type_display }}</td>
+            <td>${{ payment.amount }}</td>
+            <td>{{ payment.due_date|date:"d/m/Y" }}</td>
+            <td>
+              <span class="badge bg-{{ payment.status_color }}-lt">
+                <i class="ti {{ payment.status_icon }} me-1"></i>{{ payment.get_status_display }}
+              </span>
+            </td>
+            <td class="text-end">
+              {% if request.user.is_staff or request.user.is_superuser %}
+              <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-outline-secondary">
+                <i class="ti ti-edit me-1"></i>Editar
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty py-4">
+      <div class="empty-icon"><i class="ti ti-cash"></i></div>
+      <p class="empty-title">Sin pagos registrados</p>
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

@@ -17,22 +17,32 @@ def _tower_fees():
 
 @login_required
 def apartment_list(request):
+    from apps.towers.models import Tower
     q = request.GET.get('q', '').strip()
+    tower_filter = request.GET.get('tower', '').strip()
     apartments = Apartment.objects.select_related('tower').all()
+    if tower_filter:
+        apartments = apartments.filter(tower_id=tower_filter)
     if q:
         apartments = apartments.filter(
             models.Q(number__icontains=q) |
             models.Q(tower__name__icontains=q) |
             models.Q(tower__number__icontains=q)
         )
+    towers = Tower.objects.order_by('number')
     page_obj = Paginator(apartments, PAGE_SIZE).get_page(request.GET.get('page'))
-    return render(request, 'units/list.html', {'page_obj': page_obj, 'apartments': page_obj, 'q': q})
+    return render(request, 'units/list.html', {
+        'page_obj': page_obj, 'apartments': page_obj,
+        'q': q, 'tower_filter': tower_filter, 'towers': towers,
+    })
 
 
 @login_required
 def apartment_detail(request, pk):
+    from apps.payments.models import Payment
     apartment = get_object_or_404(Apartment, pk=pk)
-    return render(request, 'units/detail.html', {'apartment': apartment})
+    payments = Payment.objects.filter(apartment=apartment).order_by('-period', '-due_date')
+    return render(request, 'units/detail.html', {'apartment': apartment, 'payments': payments})
 
 
 @staff_required

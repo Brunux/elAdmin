@@ -15,14 +15,17 @@ from .emails import notify_staff_new_issue, notify_staff_issue_reopened, notify_
 @login_required
 def issue_list(request):
     from django.db import models as db_models
+    from apps.towers.models import Tower
     status_filter = request.GET.get('status', '')
     period_filter = request.GET.get('period', '').strip()
+    tower_filter = request.GET.get('tower', '').strip()
     q = request.GET.get('q', '').strip()
 
     all_periods = [
         d.strftime('%Y-%m')
         for d in Issue.objects.dates('created_at', 'month', order='DESC')
     ]
+    towers = Tower.objects.order_by('number')
 
     qs = Issue.objects.select_related('apartment__tower', 'reported_by__user', 'assigned_to')
     if status_filter:
@@ -30,6 +33,8 @@ def issue_list(request):
     if period_filter:
         year, month = period_filter.split('-')
         qs = qs.filter(created_at__year=year, created_at__month=month)
+    if tower_filter:
+        qs = qs.filter(apartment__tower_id=tower_filter)
     if q:
         matched_statuses = [k for k, v in Issue.STATUS_CHOICES if q.lower() in v.lower() or q.lower() in k.lower()]
         matched_categories = [k for k, v in Issue.CATEGORY_CHOICES if q.lower() in v.lower() or q.lower() in k.lower()]
@@ -53,6 +58,8 @@ def issue_list(request):
     count_base = Issue.objects
     if period_filter:
         count_base = count_base.filter(created_at__year=year, created_at__month=month)
+    if tower_filter:
+        count_base = count_base.filter(apartment__tower_id=tower_filter)
     counts = {
         'open':        count_base.filter(status='open').count(),
         'in_progress': count_base.filter(status='in_progress').count(),
@@ -72,7 +79,9 @@ def issue_list(request):
         'counts': counts,
         'status_filter': status_filter,
         'period_filter': period_filter,
+        'tower_filter': tower_filter,
         'all_periods': all_periods,
+        'towers': towers,
         'q': q,
     })
 

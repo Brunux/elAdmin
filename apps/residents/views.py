@@ -18,8 +18,12 @@ from .forms import UserCreateForm, UserEditForm, ResidentProfileForm, Invitation
 
 @login_required
 def resident_list(request):
+    from apps.towers.models import Tower
     q = request.GET.get('q', '').strip()
+    tower_filter = request.GET.get('tower', '').strip()
     residents = Resident.objects.select_related('user').prefetch_related('apartments__tower').all()
+    if tower_filter:
+        residents = residents.filter(apartments__tower_id=tower_filter).distinct()
     if q:
         residents = residents.filter(
             models.Q(user__first_name__icontains=q) |
@@ -29,14 +33,20 @@ def resident_list(request):
             models.Q(apartments__number__icontains=q) |
             models.Q(apartments__tower__name__icontains=q)
         ).distinct()
+    towers = Tower.objects.order_by('number')
     page_obj = Paginator(residents, PAGE_SIZE).get_page(request.GET.get('page'))
-    return render(request, 'residents/list.html', {'page_obj': page_obj, 'residents': page_obj, 'q': q})
+    return render(request, 'residents/list.html', {
+        'page_obj': page_obj, 'residents': page_obj,
+        'q': q, 'tower_filter': tower_filter, 'towers': towers,
+    })
 
 
 @login_required
 def resident_detail(request, pk):
+    from apps.issues.models import Issue
     resident = get_object_or_404(Resident.objects.select_related('user').prefetch_related('apartments__tower'), pk=pk)
-    return render(request, 'residents/detail.html', {'resident': resident})
+    issues = Issue.objects.filter(reported_by=resident).order_by('-created_at')
+    return render(request, 'residents/detail.html', {'resident': resident, 'issues': issues})
 
 
 @staff_required
@@ -187,13 +197,21 @@ def invite_accept(request, token):
 
 @login_required
 def invitation_list(request):
+    from apps.towers.models import Tower
     q = request.GET.get('q', '').strip()
+    tower_filter = request.GET.get('tower', '').strip()
     invitations = Invitation.objects.select_related('apartment__tower', 'created_by').all()
+    if tower_filter:
+        invitations = invitations.filter(apartment__tower_id=tower_filter)
     if q:
         invitations = invitations.filter(
             models.Q(email__icontains=q) |
             models.Q(apartment__number__icontains=q) |
             models.Q(apartment__tower__name__icontains=q)
         )
+    towers = Tower.objects.order_by('number')
     page_obj = Paginator(invitations, PAGE_SIZE).get_page(request.GET.get('page'))
-    return render(request, 'residents/invitation_list.html', {'page_obj': page_obj, 'invitations': page_obj, 'q': q})
+    return render(request, 'residents/invitation_list.html', {
+        'page_obj': page_obj, 'invitations': page_obj,
+        'q': q, 'tower_filter': tower_filter, 'towers': towers,
+    })
