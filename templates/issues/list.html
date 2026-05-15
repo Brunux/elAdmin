@@ -13,7 +13,7 @@
 {% block content %}
 <div class="row row-deck mb-4">
   <div class="col-sm-6 col-lg-2">
-    <a href="?status=open{% if q %}&q={{ q }}{% endif %}" class="card text-decoration-none {% if status_filter == 'open' %}border-red{% endif %}">
+    <a href="?status=open{% if period_filter %}&period={{ period_filter }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="card text-decoration-none {% if status_filter == 'open' %}border-red{% endif %}">
       <div class="card-body">
         <div class="subheader">Abiertos</div>
         <div class="h1 text-red">{{ counts.open }}</div>
@@ -21,7 +21,7 @@
     </a>
   </div>
   <div class="col-sm-6 col-lg-2">
-    <a href="?status=in_progress{% if q %}&q={{ q }}{% endif %}" class="card text-decoration-none {% if status_filter == 'in_progress' %}border-yellow{% endif %}">
+    <a href="?status=in_progress{% if period_filter %}&period={{ period_filter }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="card text-decoration-none {% if status_filter == 'in_progress' %}border-yellow{% endif %}">
       <div class="card-body">
         <div class="subheader">En proceso</div>
         <div class="h1 text-yellow">{{ counts.in_progress }}</div>
@@ -29,7 +29,7 @@
     </a>
   </div>
   <div class="col-sm-6 col-lg-2">
-    <a href="?status=resolved{% if q %}&q={{ q }}{% endif %}" class="card text-decoration-none {% if status_filter == 'resolved' %}border-green{% endif %}">
+    <a href="?status=resolved{% if period_filter %}&period={{ period_filter }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="card text-decoration-none {% if status_filter == 'resolved' %}border-green{% endif %}">
       <div class="card-body">
         <div class="subheader">Resueltos</div>
         <div class="h1 text-green">{{ counts.resolved }}</div>
@@ -37,7 +37,7 @@
     </a>
   </div>
   <div class="col-sm-6 col-lg-2">
-    <a href="?status=duplicated{% if q %}&q={{ q }}{% endif %}" class="card text-decoration-none {% if status_filter == 'duplicated' %}border-purple{% endif %}">
+    <a href="?status=duplicated{% if period_filter %}&period={{ period_filter }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="card text-decoration-none {% if status_filter == 'duplicated' %}border-purple{% endif %}">
       <div class="card-body">
         <div class="subheader">Duplicados</div>
         <div class="h1 text-purple">{{ counts.duplicated }}</div>
@@ -45,7 +45,7 @@
     </a>
   </div>
   <div class="col-sm-6 col-lg-2">
-    <a href="?status=closed{% if q %}&q={{ q }}{% endif %}" class="card text-decoration-none {% if status_filter == 'closed' %}border-secondary{% endif %}">
+    <a href="?status=closed{% if period_filter %}&period={{ period_filter }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="card text-decoration-none {% if status_filter == 'closed' %}border-secondary{% endif %}">
       <div class="card-body">
         <div class="subheader">Cerrados</div>
         <div class="h1 text-secondary">{{ counts.closed }}</div>
@@ -53,7 +53,7 @@
     </a>
   </div>
   <div class="col-sm-6 col-lg-2">
-    <a href="?{% if q %}q={{ q }}{% endif %}" class="card text-decoration-none {% if not status_filter %}border-primary{% endif %}">
+    <a href="?{% if period_filter %}period={{ period_filter }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="card text-decoration-none {% if not status_filter %}border-primary{% endif %}">
       <div class="card-body">
         <div class="subheader">Todos</div>
         <div class="h1">{{ counts.open|add:counts.in_progress|add:counts.resolved|add:counts.closed|add:counts.duplicated }}</div>
@@ -66,10 +66,17 @@
   <div class="card-header d-flex align-items-center gap-3 flex-wrap">
     <form method="get" class="d-flex align-items-center gap-2 flex-grow-1">
       {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+      <span class="text-secondary text-nowrap small">Periodo:</span>
+      <select name="period" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+        <option value="">Todos</option>
+        {% for p in all_periods %}
+        <option value="{{ p }}" {% if p == period_filter %}selected{% endif %}>{{ p }}</option>
+        {% endfor %}
+      </select>
       <input type="search" name="q" value="{{ q }}" class="form-control form-control-sm"
              placeholder="Buscar por título, categoría, apartamento o residente…">
       <button class="btn btn-sm btn-primary" type="submit"><i class="ti ti-search"></i></button>
-      {% if q %}<a href="?{% if status_filter %}status={{ status_filter }}{% endif %}" class="btn btn-sm btn-ghost-secondary"><i class="ti ti-x"></i></a>{% endif %}
+      {% if q or period_filter %}<a href="?{% if status_filter %}status={{ status_filter }}{% endif %}" class="btn btn-sm btn-ghost-secondary"><i class="ti ti-x"></i></a>{% endif %}
     </form>
   </div>
 </div>
@@ -79,7 +86,7 @@
 <div class="card mb-4">
   <div class="card-body p-0">
     <div class="table-responsive">
-      <table class="table table-vcenter card-table">
+      <table class="table table-vcenter table-hover card-table">
         <thead>
           <tr>
             <th>#</th><th>Título</th><th>Categoría</th><th>Apartamento</th>
@@ -88,7 +95,7 @@
         </thead>
         <tbody>
           {% for issue in own_issues %}
-          <tr>
+          <tr style="cursor:pointer" onclick="if(!event.target.closest('a,button')){window.location.href='{% url 'issues:detail' issue.pk %}'}">
             <td class="text-secondary">{{ issue.pk }}</td>
             <td class="fw-bold">{{ issue.title }}</td>
             <td>{{ issue.get_category_display }}</td>
@@ -97,11 +104,8 @@
             <td><span class="badge bg-{{ issue.status_color }}-lt"><i class="ti {{ issue.status_icon }} me-1"></i>{{ issue.get_status_display }}</span></td>
             <td class="text-secondary">{{ issue.created_at|date:"d/m/Y" }}</td>
             <td class="text-end">
-              <a href="{% url 'issues:detail' issue.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
-                <i class="ti ti-eye"></i>
-              </a>
-              <a href="{% url 'issues:edit' issue.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
-                <i class="ti ti-edit"></i>
+              <a href="{% url 'issues:edit' issue.pk %}" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Editar">
+                <i class="ti ti-edit me-1"></i>Editar
               </a>
             </td>
           </tr>
@@ -119,7 +123,7 @@
   <div class="card-body p-0">
     {% if other_issues %}
     <div class="table-responsive">
-      <table class="table table-vcenter card-table">
+      <table class="table table-vcenter table-hover card-table">
         <thead>
           <tr>
             <th>#</th><th>Título</th><th>Categoría</th><th>Apartamento</th>
@@ -128,7 +132,7 @@
         </thead>
         <tbody>
           {% for issue in other_issues %}
-          <tr>
+          <tr style="cursor:pointer" onclick="if(!event.target.closest('a,button')){window.location.href='{% url 'issues:detail' issue.pk %}'}">
             <td class="text-secondary">{{ issue.pk }}</td>
             <td class="fw-bold">{{ issue.title }}</td>
             <td>{{ issue.get_category_display }}</td>
@@ -138,12 +142,9 @@
             <td><span class="badge bg-{{ issue.status_color }}-lt"><i class="ti {{ issue.status_icon }} me-1"></i>{{ issue.get_status_display }}</span></td>
             <td class="text-secondary">{{ issue.created_at|date:"d/m/Y" }}</td>
             <td class="text-end">
-              <a href="{% url 'issues:detail' issue.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
-                <i class="ti ti-eye"></i>
-              </a>
               {% if request.user.is_staff or request.user.is_superuser %}
-              <a href="{% url 'issues:edit' issue.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
-                <i class="ti ti-edit"></i>
+              <a href="{% url 'issues:edit' issue.pk %}" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Editar">
+                <i class="ti ti-edit me-1"></i>Editar
               </a>
               {% endif %}
             </td>

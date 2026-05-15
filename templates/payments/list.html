@@ -95,7 +95,7 @@
 <div class="card mb-4">
   <div class="card-body p-0">
     <div class="table-responsive">
-      <table class="table table-vcenter card-table">
+      <table class="table table-vcenter table-hover card-table">
         <thead>
           <tr>
             <th>Apartamento</th><th>Tipo</th><th>Periodo</th>
@@ -104,7 +104,7 @@
         </thead>
         <tbody>
           {% for payment in own_payments %}
-          <tr>
+          <tr style="cursor:pointer" onclick="if(!event.target.closest('a,button')){window.location.href='{% url 'payments:detail' payment.pk %}'}">
             <td>{{ payment.apartment }}</td>
             <td>{{ payment.get_payment_type_display }}</td>
             <td>{{ payment.period }}</td>
@@ -116,12 +116,9 @@
               </span>
             </td>
             <td class="text-end">
-              <a href="{% url 'payments:detail' payment.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
-                <i class="ti ti-eye"></i>
-              </a>
               {% if payment.status in 'pending overdue' %}
-              <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-ghost-primary" data-bs-toggle="tooltip" title="Registrar comprobante">
-                <i class="ti ti-upload"></i>
+              <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Registrar comprobante">
+                <i class="ti ti-upload me-1"></i>Comprobante
               </a>
               {% endif %}
             </td>
@@ -140,7 +137,7 @@
   <div class="card-body p-0">
     {% if other_payments %}
     <div class="table-responsive">
-      <table class="table table-vcenter card-table">
+      <table class="table table-vcenter table-hover card-table">
         <thead>
           <tr>
             <th>Apartamento</th><th>Residente</th><th>Tipo</th>
@@ -149,7 +146,7 @@
         </thead>
         <tbody>
           {% for payment in other_payments %}
-          <tr>
+          <tr style="cursor:pointer" onclick="if(!event.target.closest('a,button')){window.location.href='{% url 'payments:detail' payment.pk %}'}">
             <td>{{ payment.apartment }}</td>
             <td>{{ payment.resident|default:"—" }}</td>
             <td>{{ payment.get_payment_type_display }}</td>
@@ -162,12 +159,9 @@
               </span>
             </td>
             <td class="text-end">
-              <a href="{% url 'payments:detail' payment.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
-                <i class="ti ti-eye"></i>
-              </a>
               {% if request.user.is_staff or request.user.is_superuser %}
-              <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
-                <i class="ti ti-edit"></i>
+              <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Editar">
+                <i class="ti ti-edit me-1"></i>Editar
               </a>
               {% endif %}
             </td>

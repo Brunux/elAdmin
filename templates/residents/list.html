@@ -46,7 +46,7 @@
   <div class="card-body p-0">
     {% if residents %}
       <div class="table-responsive">
-        <table class="table table-vcenter card-table">
+        <table class="table table-vcenter table-hover card-table">
           <thead>
             <tr>
               <th>Nombre</th>
@@ -60,7 +60,7 @@
           </thead>
           <tbody>
             {% for resident in residents %}
-            <tr>
+            <tr style="cursor:pointer" onclick="if(!event.target.closest('a,button')){window.location.href='{% url 'residents:detail' resident.pk %}'}">
               <td>
                 <div class="d-flex align-items-center">
                   <span class="avatar avatar-sm me-2">{{ resident.first_name|first }}{{ resident.last_name|first }}</span>
@@ -80,12 +80,9 @@
                 </span>
               </td>
               <td class="text-end">
-                <a href="{% url 'residents:detail' resident.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
-                  <i class="ti ti-eye"></i>
-                </a>
                 {% if request.user.is_staff or request.user.is_superuser %}
-                <a href="{% url 'residents:edit' resident.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
-                  <i class="ti ti-edit"></i>
+                <a href="{% url 'residents:edit' resident.pk %}" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Editar">
+                  <i class="ti ti-edit me-1"></i>Editar
                 </a>
                 {% endif %}
               </td>

@@ -16,10 +16,20 @@ from .emails import notify_staff_new_issue, notify_staff_issue_reopened, notify_
 def issue_list(request):
     from django.db import models as db_models
     status_filter = request.GET.get('status', '')
+    period_filter = request.GET.get('period', '').strip()
     q = request.GET.get('q', '').strip()
+
+    all_periods = [
+        d.strftime('%Y-%m')
+        for d in Issue.objects.dates('created_at', 'month', order='DESC')
+    ]
+
     qs = Issue.objects.select_related('apartment__tower', 'reported_by__user', 'assigned_to')
     if status_filter:
         qs = qs.filter(status=status_filter)
+    if period_filter:
+        year, month = period_filter.split('-')
+        qs = qs.filter(created_at__year=year, created_at__month=month)
     if q:
         matched_statuses = [k for k, v in Issue.STATUS_CHOICES if q.lower() in v.lower() or q.lower() in k.lower()]
         matched_categories = [k for k, v in Issue.CATEGORY_CHOICES if q.lower() in v.lower() or q.lower() in k.lower()]
@@ -39,13 +49,18 @@ def issue_list(request):
         if matched_priorities:
             q_filter |= db_models.Q(priority__in=matched_priorities)
         qs = qs.filter(q_filter)
+
+    count_base = Issue.objects
+    if period_filter:
+        count_base = count_base.filter(created_at__year=year, created_at__month=month)
     counts = {
-        'open': Issue.objects.filter(status='open').count(),
-        'in_progress': Issue.objects.filter(status='in_progress').count(),
-        'resolved': Issue.objects.filter(status='resolved').count(),
-        'closed': Issue.objects.filter(status='closed').count(),
-        'duplicated': Issue.objects.filter(status='duplicated').count(),
+        'open':        count_base.filter(status='open').count(),
+        'in_progress': count_base.filter(status='in_progress').count(),
+        'resolved':    count_base.filter(status='resolved').count(),
+        'closed':      count_base.filter(status='closed').count(),
+        'duplicated':  count_base.filter(status='duplicated').count(),
     }
+
     resident = getattr(request.user, 'resident', None)
     own_issues = qs.filter(reported_by=resident) if resident else qs.none()
     other_qs = qs.exclude(reported_by=resident) if resident else qs.all()
@@ -56,6 +71,8 @@ def issue_list(request):
         'page_obj': page_obj,
         'counts': counts,
         'status_filter': status_filter,
+        'period_filter': period_filter,
+        'all_periods': all_periods,
         'q': q,
     })
 

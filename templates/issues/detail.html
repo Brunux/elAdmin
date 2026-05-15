@@ -11,18 +11,7 @@
 </ol>
 {% endblock %}
 
-{% block page_actions %}
-  {% if request.user.is_staff or request.user.is_superuser or issue.reported_by.user == request.user %}
-  <a href="{% url 'issues:edit' issue.pk %}" class="btn btn-primary">
-    <i class="ti ti-edit me-2"></i>Editar
-  </a>
-  {% endif %}
-  {% if request.user.is_superuser %}
-  <a href="{% url 'issues:delete' issue.pk %}" class="btn btn-danger ms-2">
-    <i class="ti ti-trash me-2"></i>Eliminar
-  </a>
-  {% endif %}
-{% endblock %}
+{% block page_actions %}{% endblock %}
 
 {% block content %}
 <div class="row">

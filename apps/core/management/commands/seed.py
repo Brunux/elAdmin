@@ -290,7 +290,7 @@ class Command(BaseCommand):
             ('Elevador fuera de servicio Orión',      'elevator',     'urgent', 'in_progress', apartments[1],  residents[0],  'El elevador principal de Torre Orión está fuera de servicio.',  admin,  'Empresa de mantenimiento en camino.'),
         ]
 
-        for title, category, priority, status, apt, reporter, desc, assigned, note_body in items:
+        for idx, (title, category, priority, status, apt, reporter, desc, assigned, note_body) in enumerate(items):
             resolved_at = now if status == 'resolved' else None
             issue, created = Issue.objects.get_or_create(
                 title=title,
@@ -306,6 +306,9 @@ class Command(BaseCommand):
                 ),
             )
             if created:
+                months_ago = (idx * 6) // len(items)
+                backdated = now - timedelta(days=30 * months_ago + idx % 15)
+                Issue.objects.filter(pk=issue.pk).update(created_at=backdated)
                 IssueNote.objects.create(
                     issue=issue, status=status, body=note_body, created_by=assigned or admin,
                 )
