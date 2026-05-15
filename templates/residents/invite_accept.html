@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Completa tu registro{% endblock %}
+
+{% block body %}
+<div class="page page-center">
+  <div class="container container-tight py-4">
+    <div class="text-center mb-4">
+      <h1 class="fw-bold">
+        <i class="ti ti-building me-2"></i>El Admin
+      </h1>
+      <p class="text-secondary">Administración de edificio</p>
+    </div>
+
+    {% if existing_user %}
+    <div class="card card-md">
+      <div class="card-body text-center">
+        <div class="mb-3"><i class="ti ti-user-check text-success" style="font-size:3rem"></i></div>
+        <h2 class="h2 mb-1">Cuenta existente detectada</h2>
+        <p class="text-secondary mb-4">
+          La invitación es para <strong>{{ invitation.email }}</strong>, que ya tiene una cuenta registrada.
+          {% if invitation.apartment %}
+            Se añadirá <strong>{{ invitation.apartment }}</strong> a tus apartamentos.
+          {% endif %}
+        </p>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="ti ti-building-plus me-2"></i>Confirmar y añadir apartamento
+          </button>
+        </form>
+        <div class="mt-3">
+          <a href="{% url 'core:login' %}" class="text-secondary small">Cancelar</a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="card card-md">
+      <div class="card-body">
+        <h2 class="h2 text-center mb-1">Completa tu registro</h2>
+        <p class="text-center text-secondary mb-4">
+          Registro para <strong>{{ invitation.email }}</strong>
+          {% if invitation.apartment %}
+            · {{ invitation.apartment }}
+          {% endif %}
+        </p>
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-danger">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="mb-3">
+              <label class="form-label required">{{ field.label }}</label>
+              {{ field }}
+              {% for error in field.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-footer">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="ti ti-user-check me-2"></i>Crear mi cuenta
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="text-center mt-3 text-secondary small">
+      ¿Ya tienes cuenta? <a href="{% url 'core:login' %}">Inicia sesión</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

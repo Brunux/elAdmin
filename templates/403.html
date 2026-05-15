@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Acceso denegado{% endblock %}
+{% block body %}
+<div class="page page-center">
+  <div class="container-tight py-4 text-center">
+    <div class="text-danger mb-3" style="font-size:4rem;"><i class="ti ti-lock"></i></div>
+    <h1 class="mb-2">Acceso denegado</h1>
+    <p class="text-secondary mb-4">No tienes permisos para realizar esta acción.</p>
+    <a href="javascript:history.back()" class="btn btn-ghost-secondary me-2">Regresar</a>
+    <a href="/" class="btn btn-primary">Ir al dashboard</a>
+  </div>
+</div>
+{% endblock %}

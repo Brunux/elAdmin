@@ -1,0 +1,137 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Mi cuenta{% endblock %}
+{% block page_title %}Mi cuenta{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+
+    <ul class="nav nav-tabs mb-3">
+      <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'profile' %}active{% endif %}" href="#profile" data-bs-toggle="tab">
+          <i class="ti ti-user me-1"></i>Perfil
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'password' %}active{% endif %}" href="#password" data-bs-toggle="tab">
+          <i class="ti ti-lock me-1"></i>Contraseña
+        </a>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+
+      <div class="tab-pane {% if active_tab == 'profile' %}active show{% endif %}" id="profile">
+        <div class="card mb-3">
+          <div class="card-header"><h3 class="card-title">Información personal</h3></div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Apellido</label>
+                <input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Correo electrónico</label>
+                <input type="email" name="email" class="form-control" value="{{ request.user.email }}">
+                <small class="form-hint">Al cambiar el correo se enviará una confirmación al nuevo correo. Tu usuario también se actualizará.</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Tipo de cuenta</label>
+                <input type="text" class="form-control" value="{% if request.user.is_superuser %}Administrador{% elif request.user.is_staff %}Staff{% else %}Usuario{% endif %}" disabled>
+              </div>
+              <button type="submit" name="save_profile" class="btn btn-primary">
+                <i class="ti ti-device-floppy me-1"></i>Guardar cambios
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {% if request.user.resident %}
+        {% with r=request.user.resident %}
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Información de residente</h3></div>
+          <div class="card-body">
+            <dl class="row mb-3">
+              <dt class="col-5">Apartamentos</dt>
+              <dd class="col-7">
+                {% for apt in r.apartments.all %}
+                  <div>{{ apt }} <span class="text-secondary small">— {{ apt.tower }}</span></div>
+                {% empty %}—{% endfor %}
+              </dd>
+              <dt class="col-5">Tipo de residente</dt>
+              <dd class="col-7">{{ r.get_resident_type_display }}</dd>
+              <dt class="col-5">Teléfono</dt>
+              <dd class="col-7">{{ r.phone|default:"—" }}</dd>
+              <dt class="col-5">Fecha de ingreso</dt>
+              <dd class="col-7">{{ r.move_in_date|date:"d/m/Y"|default:"—" }}</dd>
+              <dt class="col-5">Estado</dt>
+              <dd class="col-7">
+                <span class="badge bg-{% if r.status == 'active' %}success{% else %}secondary{% endif %}-lt">
+                  {{ r.get_status_display }}
+                </span>
+              </dd>
+            </dl>
+            <form method="post">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label">Contacto de emergencia</label>
+                <input type="text" name="emergency_contact_name" class="form-control" value="{{ r.emergency_contact_name }}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Teléfono de emergencia</label>
+                <input type="text" name="emergency_contact_phone" class="form-control" value="{{ r.emergency_contact_phone }}">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Notas</label>
+                <textarea name="notes" class="form-control" rows="3">{{ r.notes }}</textarea>
+              </div>
+              <button type="submit" name="save_profile" class="btn btn-primary">
+                <i class="ti ti-device-floppy me-1"></i>Guardar cambios
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endwith %}
+        {% endif %}
+      </div>
+
+      <div class="tab-pane {% if active_tab == 'password' %}active show{% endif %}" id="password">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Cambiar contraseña</h3></div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              {% for field in password_form %}
+              <div class="mb-3">
+                <label class="form-label {% if field.field.required %}required{% endif %}">{{ field.label }}</label>
+                {% with field.field.widget as w %}
+                  {% if w.input_type == 'password' %}
+                    <input type="password" name="{{ field.html_name }}" id="{{ field.auto_id }}"
+                           class="form-control{% if field.errors %} is-invalid{% endif %}"
+                           {% if field.field.required %}required{% endif %}>
+                  {% else %}
+                    {{ field }}
+                  {% endif %}
+                {% endwith %}
+                {% if field.help_text %}<small class="form-hint">{{ field.help_text }}</small>{% endif %}
+                {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+              </div>
+              {% endfor %}
+              <button type="submit" name="save_password" class="btn btn-primary">
+                <i class="ti ti-lock me-1"></i>Actualizar contraseña
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

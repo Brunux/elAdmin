@@ -1,0 +1,107 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Invitar Residente{% endblock %}
+{% block page_title %}Invitar Residente{% endblock %}
+{% block nav_residents %}active{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'residents:list' %}">Residentes</a></li>
+  <li class="breadcrumb-item active">Invitar</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-mail me-2"></i>Enviar invitación</h3>
+      </div>
+      <div class="card-body">
+        <p class="text-secondary mb-4">
+          El residente recibirá un correo con un enlace para completar su registro.
+          Selecciona su apartamento y tipo para que queden pre-asignados automáticamente.
+        </p>
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label required">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% for error in form.email.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label required">{{ form.resident_type.label }}</label>
+            {{ form.resident_type }}
+            {% for error in form.resident_type.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">{{ form.apartment.label }}</label>
+            <select name="apartment" id="id_apartment" class="form-select">
+              <option value="">— Selecciona un tipo primero —</option>
+            </select>
+            {% for error in form.apartment.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+
+          <div class="mt-4">
+            <button type="submit" class="btn btn-primary me-2">
+              <i class="ti ti-send me-1"></i>Enviar invitación
+            </button>
+            <a href="{% url 'residents:list' %}" class="btn btn-ghost-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <span class="text-secondary"><i class="ti ti-list-check" style="font-size:1.5rem;"></i></span>
+          <div>
+            <div class="fw-bold">Invitaciones enviadas</div>
+            <small class="text-secondary">Consulta el historial de invitaciones.</small>
+          </div>
+          <a href="{% url 'residents:invitation_list' %}" class="btn btn-sm btn-outline-secondary ms-auto">Ver</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const typeSelect = document.getElementById('id_resident_type');
+  const aptSelect = document.getElementById('id_apartment');
+
+  function loadApartments(type) {
+    aptSelect.innerHTML = '<option value="">Cargando…</option>';
+    fetch('/residents/api/apartments/?type=' + encodeURIComponent(type))
+      .then(r => r.json())
+      .then(data => {
+        aptSelect.innerHTML = '<option value="">— Selecciona un apartamento —</option>';
+        data.forEach(apt => {
+          const opt = document.createElement('option');
+          opt.value = apt.id;
+          opt.textContent = apt.label;
+          aptSelect.appendChild(opt);
+        });
+      });
+  }
+
+  typeSelect.addEventListener('change', function () {
+    if (this.value) {
+      loadApartments(this.value);
+    } else {
+      aptSelect.innerHTML = '<option value="">— Selecciona un tipo primero —</option>';
+    }
+  });
+
+  if (typeSelect.value) loadApartments(typeSelect.value);
+})();
+</script>
+{% endblock %}

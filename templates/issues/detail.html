@@ -1,0 +1,122 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Reporte #{{ issue.pk }}{% endblock %}
+{% block page_title %}Reporte #{{ issue.pk }}{% endblock %}
+{% block nav_issues %}active{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'issues:list' %}">Reportes</a></li>
+  <li class="breadcrumb-item active">#{{ issue.pk }}</li>
+</ol>
+{% endblock %}
+
+{% block page_actions %}
+  {% if request.user.is_staff or request.user.is_superuser or issue.reported_by.user == request.user %}
+  <a href="{% url 'issues:edit' issue.pk %}" class="btn btn-primary">
+    <i class="ti ti-edit me-2"></i>Editar
+  </a>
+  {% endif %}
+  {% if request.user.is_superuser %}
+  <a href="{% url 'issues:delete' issue.pk %}" class="btn btn-danger ms-2">
+    <i class="ti ti-trash me-2"></i>Eliminar
+  </a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card mb-3">
+      <div class="card-header">
+        <div>
+          <h3 class="card-title">{{ issue.title }}</h3>
+          <small class="text-secondary">{{ issue.created_at|date:"d/m/Y H:i" }}</small>
+        </div>
+        <div class="card-options gap-2">
+          <span class="badge bg-{{ issue.priority_color }}">{{ issue.get_priority_display }}</span>
+          <span class="badge bg-{{ issue.status_color }}">{{ issue.get_status_display }}</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <p style="white-space: pre-wrap;">{{ issue.description }}</p>
+        {% if issue.photo %}
+          <div class="mt-3">
+            <img src="{{ issue.photo.url }}" class="img-fluid rounded" style="max-height:400px;">
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    {% if notes %}
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-history me-2"></i>Historial de estados</h3>
+      </div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          {% for note in notes %}
+          <li class="list-group-item py-3">
+            <div class="d-flex align-items-center gap-3">
+              <span class="badge bg-{% if note.status == 'open' %}red{% elif note.status == 'in_progress' %}yellow{% elif note.status == 'resolved' %}green{% else %}secondary{% endif %}">
+                {{ note.get_status_display }}
+              </span>
+              <span class="text-secondary small">
+                {{ note.created_at|date:"d/m/Y H:i" }}
+                {% if note.created_by %}— {{ note.created_by.get_full_name|default:note.created_by.username }}{% endif %}
+              </span>
+            </div>
+            {% if note.body %}<p class="mb-0 mt-2 text-secondary small">{{ note.body }}</p>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Detalles</h3></div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-5">Categoría</dt>
+          <dd class="col-7">{{ issue.get_category_display }}</dd>
+          <dt class="col-5">Torre</dt>
+          <dd class="col-7">
+            {% if issue.apartment %}<a href="{% url 'towers:detail' issue.apartment.tower.pk %}">{{ issue.apartment.tower }}</a>{% else %}—{% endif %}
+          </dd>
+          <dt class="col-5">Apartamento</dt>
+          <dd class="col-7">
+            {% if issue.apartment %}<a href="{% url 'units:detail' issue.apartment.pk %}">{{ issue.apartment }}</a>{% else %}—{% endif %}
+          </dd>
+          <dt class="col-5">Reportado por</dt>
+          <dd class="col-7">
+            {% if issue.reported_by %}<a href="{% url 'residents:detail' issue.reported_by.pk %}">{{ issue.reported_by }}</a>{% else %}—{% endif %}
+          </dd>
+          <dt class="col-5">Asignado a</dt>
+          <dd class="col-7">{{ issue.assigned_to|default:"—" }}</dd>
+          {% if issue.duplicate_of %}
+          <dt class="col-5">Duplicado de</dt>
+          <dd class="col-7">
+            <a href="{% url 'issues:detail' issue.duplicate_of.pk %}">#{{ issue.duplicate_of.pk }} — {{ issue.duplicate_of.title }}</a>
+          </dd>
+          {% endif %}
+          {% if issue.resolved_at %}
+          <dt class="col-5">Resuelto el</dt>
+          <dd class="col-7">{{ issue.resolved_at|date:"d/m/Y H:i" }}</dd>
+          {% endif %}
+          <dt class="col-5">Actualizado</dt>
+          <dd class="col-7">{{ issue.updated_at|date:"d/m/Y H:i" }}</dd>
+        </dl>
+      </div>
+      {% if request.user.is_staff or request.user.is_superuser or issue.reported_by.user == request.user %}
+      <div class="card-footer">
+        <a href="{% url 'issues:edit' issue.pk %}" class="btn btn-primary w-100">
+          <i class="ti ti-edit me-2"></i>Actualizar reporte
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

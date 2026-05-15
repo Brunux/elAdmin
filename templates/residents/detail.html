@@ -1,0 +1,75 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}{{ resident.full_name }}{% endblock %}
+{% block page_title %}{{ resident.full_name }}{% endblock %}
+{% block nav_residents %}active{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'residents:list' %}">Residentes</a></li>
+  <li class="breadcrumb-item active">{{ resident.full_name }}</li>
+</ol>
+{% endblock %}
+
+{% block page_actions %}
+  {% if request.user.is_staff or request.user.is_superuser %}
+  <a href="{% url 'residents:edit' resident.pk %}" class="btn btn-primary">
+    <i class="ti ti-edit me-2"></i>Editar
+  </a>
+  {% endif %}
+  {% if request.user.is_superuser %}
+  <a href="{% url 'residents:delete' resident.pk %}" class="btn btn-danger ms-2">
+    <i class="ti ti-trash me-2"></i>Eliminar
+  </a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body text-center">
+        {% if resident.photo %}
+          <img src="{{ resident.photo.url }}" class="avatar avatar-xl mb-3 rounded-circle">
+        {% else %}
+          <span class="avatar avatar-xl mb-3" style="font-size:2rem;">
+            {{ resident.first_name|first }}{{ resident.last_name|first }}
+          </span>
+        {% endif %}
+        <h3 class="m-0">{{ resident.full_name }}</h3>
+        <p class="text-secondary">{{ resident.get_resident_type_display }}</p>
+        <span class="badge bg-{% if resident.status == 'active' %}success{% else %}secondary{% endif %}">
+          {{ resident.get_status_display }}
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Información de contacto</h3></div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-5">Correo</dt><dd class="col-7">{{ resident.email }}</dd>
+          <dt class="col-5">Teléfono</dt><dd class="col-7">{{ resident.phone|default:"—" }}</dd>
+          <dt class="col-5">Apartamentos</dt>
+          <dd class="col-7">
+            {% for apt in resident.apartments.all %}
+              <div><a href="{% url 'units:detail' apt.pk %}">{{ apt }}</a>
+              <span class="text-secondary small">— <a href="{% url 'towers:detail' apt.tower.pk %}">{{ apt.tower }}</a></span></div>
+            {% empty %}—{% endfor %}
+          </dd>
+          <dt class="col-5">Ingreso</dt><dd class="col-7">{{ resident.move_in_date|date:"d/m/Y"|default:"—" }}</dd>
+          <dt class="col-5">Salida</dt><dd class="col-7">{{ resident.move_out_date|date:"d/m/Y"|default:"—" }}</dd>
+          <dt class="col-5">Contacto emergencia</dt><dd class="col-7">{{ resident.emergency_contact_name|default:"—" }}</dd>
+          <dt class="col-5">Tel. emergencia</dt><dd class="col-7">{{ resident.emergency_contact_phone|default:"—" }}</dd>
+        </dl>
+        {% if resident.notes %}
+          <hr>
+          <h4>Notas</h4>
+          <p>{{ resident.notes }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

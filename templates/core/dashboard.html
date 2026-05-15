@@ -1,0 +1,120 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block page_actions %}
+  {% if request.user.is_staff or request.user.is_superuser %}
+  <a href="{% url 'residents:invite_create' %}" class="btn btn-primary">
+    <i class="ti ti-mail-forward me-2"></i>Invitar residente
+  </a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row row-deck row-cards">
+  <div class="col-sm-6 col-lg-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="subheader">Reportes</div>
+        <div class="h1 mb-3 {% if open_issues > 0 %}text-warning{% endif %}">{{ open_issues }}</div>
+        <div><a href="{% url 'issues:list' %}" class="link-secondary">Ver todos <i class="ti ti-arrow-right"></i></a></div>
+      </div>
+      <div class="card-footer">
+        <span class="{% if open_issues > 0 %}text-warning{% else %}text-success{% endif %}">
+          <i class="ti ti-alert-triangle me-1"></i>
+        </span>
+        <span class="text-secondary">{{ open_issues }} abiertos</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="subheader">Apartamentos</div>
+        <div class="h1 mb-3">{{ total_apartments }}</div>
+        <div><a href="{% url 'units:list' %}" class="link-secondary">Ver todos <i class="ti ti-arrow-right"></i></a></div>
+      </div>
+      <div class="card-footer">
+        <span class="text-blue"><i class="ti ti-building-community me-1"></i></span>
+        <span class="text-secondary">{{ occupied_apartments }} ocupados</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="subheader">Residentes</div>
+        <div class="h1 mb-3">{{ total_residents }}</div>
+        <div><a href="{% url 'residents:list' %}" class="link-secondary">Ver todos <i class="ti ti-arrow-right"></i></a></div>
+      </div>
+      <div class="card-footer"><span class="text-primary"><i class="ti ti-users me-1"></i></span></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="subheader">Pagos pendientes</div>
+        <div class="h1 mb-3 {% if pending_payments > 0 %}text-danger{% endif %}">{{ pending_payments }}</div>
+        <div><a href="{% url 'payments:list' %}" class="link-secondary">Ver pagos <i class="ti ti-arrow-right"></i></a></div>
+      </div>
+      <div class="card-footer">
+        <span class="{% if pending_payments > 0 %}text-danger{% else %}text-success{% endif %}">
+          <i class="ti ti-cash me-1"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-speakerphone me-2"></i>Anuncios recientes</h3>
+        <div class="card-options">
+          <a href="{% url 'announcements:create' %}" class="btn btn-primary btn-sm">
+            <i class="ti ti-plus me-1"></i>Nuevo
+          </a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        {% if recent_announcements %}
+          <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+              <thead>
+                <tr><th>Título</th><th>Prioridad</th><th>Fecha</th><th></th></tr>
+              </thead>
+              <tbody>
+                {% for ann in recent_announcements %}
+                <tr>
+                  <td>{{ ann.title }}</td>
+                  <td>
+                    <span class="badge bg-{% if ann.priority == 'urgent' %}red{% elif ann.priority == 'high' %}orange{% elif ann.priority == 'normal' %}blue{% else %}secondary{% endif %}-lt">
+                      {{ ann.get_priority_display }}
+                    </span>
+                  </td>
+                  <td class="text-secondary">{{ ann.created_at|date:"d/m/Y" }}</td>
+                  <td><a href="{% url 'announcements:detail' ann.pk %}" class="btn btn-sm btn-ghost-secondary">Ver</a></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="empty">
+            <div class="empty-icon"><i class="ti ti-speakerphone"></i></div>
+            <p class="empty-title">Sin anuncios recientes</p>
+            <div class="empty-action">
+              <a href="{% url 'announcements:create' %}" class="btn btn-primary">
+                <i class="ti ti-plus me-2"></i>Crear anuncio
+              </a>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

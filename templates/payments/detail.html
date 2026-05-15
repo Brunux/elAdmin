@@ -1,0 +1,77 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Pago #{{ payment.pk }}{% endblock %}
+{% block page_title %}Pago #{{ payment.pk }}{% endblock %}
+{% block nav_payments %}active{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'payments:list' %}">Pagos</a></li>
+  <li class="breadcrumb-item active">Pago #{{ payment.pk }}</li>
+</ol>
+{% endblock %}
+
+{% block page_actions %}
+  {% if request.user.is_staff or request.user.is_superuser %}
+    <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-primary">
+      <i class="ti ti-edit me-2"></i>Editar
+    </a>
+  {% elif payment.resident.user == request.user and payment.status in 'pending overdue' %}
+    <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-primary">
+      <i class="ti ti-upload me-2"></i>Registrar comprobante
+    </a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-5">Torre</dt>
+          <dd class="col-7">
+            <a href="{% url 'towers:detail' payment.apartment.tower.pk %}">{{ payment.apartment.tower }}</a>
+          </dd>
+          <dt class="col-5">Apartamento</dt>
+          <dd class="col-7">
+            <a href="{% url 'units:detail' payment.apartment.pk %}">{{ payment.apartment }}</a>
+          </dd>
+          <dt class="col-5">Residente</dt><dd class="col-7">{{ payment.resident|default:"—" }}</dd>
+          <dt class="col-5">Tipo</dt><dd class="col-7">{{ payment.get_payment_type_display }}</dd>
+          <dt class="col-5">Periodo</dt><dd class="col-7">{{ payment.period }}</dd>
+          <dt class="col-5">Monto</dt><dd class="col-7 fw-bold">${{ payment.amount }}</dd>
+          <dt class="col-5">Vencimiento</dt><dd class="col-7">{{ payment.due_date|date:"d/m/Y" }}</dd>
+          <dt class="col-5">Fecha de pago</dt><dd class="col-7">{{ payment.paid_date|date:"d/m/Y"|default:"—" }}</dd>
+          <dt class="col-5">Referencia</dt><dd class="col-7">{{ payment.reference|default:"—" }}</dd>
+          <dt class="col-5">Estado</dt>
+          <dd class="col-7">
+            <span class="badge bg-{% if payment.status == 'paid' %}success{% elif payment.status == 'overdue' %}danger{% elif payment.status == 'pending' %}warning{% elif payment.status == 'submitted' %}blue{% else %}secondary{% endif %}">
+              {{ payment.get_status_display }}
+            </span>
+          </dd>
+        </dl>
+        {% if payment.notes %}<hr><p>{{ payment.notes }}</p>{% endif %}
+        {% if payment.receipt %}
+        <hr>
+        <div class="d-flex align-items-center gap-2">
+          <i class="ti ti-paperclip text-secondary"></i>
+          <a href="{{ payment.receipt.url }}" target="_blank" class="text-decoration-none">
+            Ver comprobante
+          </a>
+        </div>
+        {% endif %}
+      </div>
+      {% if request.user.is_staff or request.user.is_superuser %}
+        {% if payment.status == 'submitted' %}
+        <div class="card-footer">
+          <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-success w-100">
+            <i class="ti ti-circle-check me-2"></i>Confirmar pago
+          </a>
+        </div>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

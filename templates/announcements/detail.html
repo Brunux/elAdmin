@@ -1,0 +1,52 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}{{ announcement.title }}{% endblock %}
+{% block page_title %}{{ announcement.title }}{% endblock %}
+{% block nav_announcements %}active{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'announcements:list' %}">Anuncios</a></li>
+  <li class="breadcrumb-item active">{{ announcement.title }}</li>
+</ol>
+{% endblock %}
+
+{% block page_actions %}
+  {% if request.user.is_staff or request.user.is_superuser %}
+  <a href="{% url 'announcements:edit' announcement.pk %}" class="btn btn-primary">
+    <i class="ti ti-edit me-2"></i>Editar
+  </a>
+  {% endif %}
+  {% if request.user.is_superuser %}
+  <a href="{% url 'announcements:delete' announcement.pk %}" class="btn btn-danger ms-2">
+    <i class="ti ti-trash me-2"></i>Eliminar
+  </a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h3 class="card-title">{{ announcement.title }}</h3>
+          <small class="text-secondary">{{ announcement.created_at|date:"d/m/Y H:i" }} — {{ announcement.author|default:"Sistema" }}</small>
+        </div>
+        <div class="card-options">
+          <span class="badge bg-{% if announcement.priority == 'urgent' %}red{% elif announcement.priority == 'high' %}orange{% elif announcement.priority == 'normal' %}blue{% else %}secondary{% endif %}">
+            {{ announcement.get_priority_display }}
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <p style="white-space: pre-wrap;">{{ announcement.content }}</p>
+        {% if announcement.expiry_date %}
+          <hr>
+          <small class="text-secondary">Expira: {{ announcement.expiry_date|date:"d/m/Y" }}</small>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

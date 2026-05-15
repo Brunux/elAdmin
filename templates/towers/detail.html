@@ -1,0 +1,221 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}{{ tower }}{% endblock %}
+{% block page_title %}{{ tower }}{% endblock %}
+{% block nav_towers %}active{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  new Chart(document.getElementById('chartStatus'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Pendiente', 'En revisión', 'Pagado', 'Vencido', 'Cancelado'],
+      datasets: [{
+        data: [
+          {{ status_counts.pending }}, {{ status_counts.submitted }},
+          {{ status_counts.paid }}, {{ status_counts.overdue }}, {{ status_counts.cancelled }}
+        ],
+        backgroundColor: ['#f59f00', '#206bc4', '#2fb344', '#d63939', '#adb5bd'],
+        borderWidth: 0,
+      }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+  });
+
+  new Chart(document.getElementById('chartMonthly'), {
+    type: 'bar',
+    data: {
+      labels: {{ chart_labels|safe }},
+      datasets: [
+        { label: 'Pagado',    data: {{ chart_paid|safe }},    backgroundColor: '#2fb344' },
+        { label: 'Pendiente', data: {{ chart_pending|safe }}, backgroundColor: '#f59f00' },
+        { label: 'Vencido',   data: {{ chart_overdue|safe }}, backgroundColor: '#d63939' },
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } },
+      scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
+    }
+  });
+});
+</script>
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'towers:list' %}">Torres</a></li>
+  <li class="breadcrumb-item active">{{ tower }}</li>
+</ol>
+{% endblock %}
+
+{% block page_actions %}
+  {% if request.user.is_staff or request.user.is_superuser %}
+  <a href="{% url 'towers:edit' tower.pk %}" class="btn btn-primary">
+    <i class="ti ti-edit me-2"></i>Editar
+  </a>
+  {% endif %}
+  {% if request.user.is_superuser %}
+  <a href="{% url 'towers:delete' tower.pk %}" class="btn btn-danger ms-2">
+    <i class="ti ti-trash me-2"></i>Eliminar
+  </a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-3 d-flex align-items-center gap-2">
+  <form method="get" class="d-flex align-items-center gap-2">
+    <label class="form-label mb-0 text-nowrap">Periodo:</label>
+    <select name="period" class="form-select w-auto" onchange="this.form.submit()">
+      <option value="">Todos</option>
+      {% for p in all_periods %}
+      <option value="{{ p }}" {% if p == selected_period %}selected{% endif %}>{{ p }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  {% if selected_period %}
+  <a href="?" class="btn btn-ghost-secondary btn-sm"><i class="ti ti-x"></i></a>
+  {% endif %}
+</div>
+
+<div class="row row-deck mb-3">
+  <div class="col-sm-6 col-lg-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="subheader">Pendientes</div>
+        <div class="h1 text-warning">{{ status_counts.pending }}</div>
+        <div class="text-secondary">${{ status_amounts.pending }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="subheader">En revisión</div>
+        <div class="h1 text-blue">{{ status_counts.submitted }}</div>
+        <div class="text-secondary">${{ status_amounts.submitted }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="subheader">Pagados</div>
+        <div class="h1 text-success">{{ status_counts.paid }}</div>
+        <div class="text-secondary">${{ status_amounts.paid }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="subheader">Vencidos</div>
+        <div class="h1 text-danger">{{ status_counts.overdue }}</div>
+        <div class="text-secondary">${{ status_amounts.overdue }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row row-deck mb-3">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Pagos por estado</h3></div>
+      <div class="card-body d-flex align-items-center justify-content-center" style="min-height:220px">
+        <canvas id="chartStatus"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Montos por mes</h3></div>
+      <div class="card-body">
+        <canvas id="chartMonthly" height="100"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-4">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h3 class="card-title">Información</h3>
+        <dl class="row">
+          <dt class="col-6">Número</dt><dd class="col-6">{{ tower.number }}</dd>
+          <dt class="col-6">Nombre</dt><dd class="col-6">{{ tower.name }}</dd>
+          <dt class="col-6">Pisos</dt><dd class="col-6">{{ tower.floors }}</dd>
+          <dt class="col-6">Apartamentos</dt><dd class="col-6">{{ apartments.count }}</dd>
+        </dl>
+        {% if tower.description %}
+          <p class="text-secondary">{{ tower.description }}</p>
+        {% endif %}
+      </div>
+      {% if request.user.is_staff or request.user.is_superuser %}
+      <div class="card-footer">
+        <a href="{% url 'units:create' %}" class="btn btn-sm btn-outline-primary w-100">
+          <i class="ti ti-plus me-1"></i>Agregar apartamento
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Apartamentos</h3></div>
+      <div class="card-body p-0">
+        {% if apartments %}
+          <table class="table table-vcenter card-table">
+            <thead>
+              <tr>
+                <th>Número</th><th>Piso</th><th>Área</th><th>Cuota</th><th>Propietario</th><th>Inquilino</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in apartments_data %}
+              <tr>
+                <td class="fw-bold">{{ row.apt.number }}</td>
+                <td>{{ row.apt.floor }}</td>
+                <td>{% if row.apt.area_sqm %}{{ row.apt.area_sqm }} m²{% else %}—{% endif %}</td>
+                <td>${{ row.apt.monthly_fee }}</td>
+                <td>
+                  {% if row.owner %}<a href="{% url 'residents:detail' row.owner.pk %}">{{ row.owner.full_name }}</a>{% else %}&mdash;{% endif %}
+                </td>
+                <td>
+                  {% if row.tenant %}<a href="{% url 'residents:detail' row.tenant.pk %}">{{ row.tenant.full_name }}</a>{% else %}&mdash;{% endif %}
+                </td>
+                <td class="text-end">
+                  <a href="{% url 'units:detail' row.apt.pk %}" class="btn btn-sm btn-ghost-secondary">
+                    <i class="ti ti-eye"></i>
+                  </a>
+                  {% if request.user.is_staff or request.user.is_superuser %}
+                  <a href="{% url 'units:edit' row.apt.pk %}" class="btn btn-sm btn-ghost-secondary">
+                    <i class="ti ti-edit"></i>
+                  </a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="empty py-4">
+            <p class="empty-title">Sin apartamentos en esta torre</p>
+            {% if request.user.is_staff or request.user.is_superuser %}
+            <div class="empty-action">
+              <a href="{% url 'units:create' %}" class="btn btn-outline-primary btn-sm">
+                <i class="ti ti-plus me-1"></i>Agregar apartamento
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

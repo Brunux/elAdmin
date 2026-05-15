@@ -1,0 +1,75 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Apartamento {{ apartment.number }}{% endblock %}
+{% block page_title %}Apartamento {{ apartment.number }}{% endblock %}
+{% block nav_units %}active{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'units:list' %}">Apartamentos</a></li>
+  <li class="breadcrumb-item active">{{ apartment.number }}</li>
+</ol>
+{% endblock %}
+
+{% block page_actions %}
+  {% if request.user.is_staff or request.user.is_superuser %}
+  <a href="{% url 'units:edit' apartment.pk %}" class="btn btn-primary">
+    <i class="ti ti-edit me-2"></i>Editar
+  </a>
+  {% endif %}
+  {% if request.user.is_superuser %}
+  <a href="{% url 'units:delete' apartment.pk %}" class="btn btn-danger ms-2">
+    <i class="ti ti-trash me-2"></i>Eliminar
+  </a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h3 class="card-title">Información</h3>
+        <dl class="row">
+          <dt class="col-6">Número</dt><dd class="col-6">{{ apartment.number }}</dd>
+          <dt class="col-6">Torre</dt>
+          <dd class="col-6"><a href="{% url 'towers:detail' apartment.tower.pk %}">{{ apartment.tower }}</a></dd>
+          <dt class="col-6">Piso</dt><dd class="col-6">{{ apartment.floor }}</dd>
+          <dt class="col-6">Área</dt><dd class="col-6">{% if apartment.area_sqm %}{{ apartment.area_sqm }} m²{% else %}—{% endif %}</dd>
+          <dt class="col-6">Cuota mensual</dt><dd class="col-6">${{ apartment.monthly_fee }}</dd>
+        </dl>
+        {% if apartment.notes %}<p class="text-secondary mt-2">{{ apartment.notes }}</p>{% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Residentes</h3></div>
+      <div class="card-body p-0">
+        {% if apartment.residents.all %}
+          <table class="table table-vcenter card-table">
+            <thead><tr><th>Nombre</th><th>Tipo</th><th>Estado</th></tr></thead>
+            <tbody>
+              {% for r in apartment.residents.all %}
+              <tr>
+                <td><a href="{% url 'residents:detail' r.pk %}">{{ r.full_name }}</a></td>
+                <td>{{ r.get_resident_type_display }}</td>
+                <td>
+                  <span class="badge bg-{% if r.status == 'active' %}success{% else %}secondary{% endif %}-lt">
+                    {{ r.get_status_display }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="empty py-4">
+            <p class="empty-title">Sin residentes asignados</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Configuración{% endblock %}
+{% block page_title %}Configuración{% endblock %}
+{% block nav_config %}active{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="card mb-3">
+        <div class="card-header">
+          <h3 class="card-title"><i class="ti ti-calendar-dollar me-2"></i>Generación automática de pagos</h3>
+        </div>
+        <div class="card-body">
+          <p class="text-secondary small">
+            Se ejecuta el <strong>día 1 de cada mes a las 10:00 am</strong>. Crea un registro de pago por cada
+            apartamento ocupado, vinculado al propietario, usando la cuota mensual del apartamento.
+          </p>
+          <div class="mb-3">
+            <label class="form-check">
+              {{ form.auto_payments_enabled }}
+              <span class="form-check-label">{{ form.auto_payments_enabled.label }}</span>
+            </label>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ form.payment_type.label }}</label>
+              {{ form.payment_type }}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ form.payment_due_day.label }}</label>
+              {{ form.payment_due_day }}
+              <small class="text-secondary">{{ form.payment_due_day.help_text }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title"><i class="ti ti-clock-exclamation me-2"></i>Revisión de pagos vencidos</h3>
+        </div>
+        <div class="card-body">
+          <p class="text-secondary small">
+            Se ejecuta <strong>diariamente a las 10:00 am</strong>. Cambia a <em>Vencido</em> todos los pagos
+            con estado <em>Pendiente</em> cuya fecha límite ya pasó.
+          </p>
+          <div class="mb-3">
+            <label class="form-check">
+              {{ form.overdue_check_enabled }}
+              <span class="form-check-label">{{ form.overdue_check_enabled.label }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title"><i class="ti ti-building me-2"></i>Monto de mantenimiento predeterminado por torre</h3>
+        </div>
+        <div class="card-body p-0">
+          {{ fee_formset.management_form }}
+          <table class="table table-vcenter card-table mb-0">
+            <thead>
+              <tr>
+                <th>Torre</th>
+                <th>Cuota mensual</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for fee_form in fee_formset %}
+                {{ fee_form.id }}
+                <tr>
+                  <td class="fw-medium">{{ fee_form.instance.tower }}</td>
+                  <td style="width:200px">{{ fee_form.amount }}</td>
+                </tr>
+                {% for error in fee_form.amount.errors %}
+                  <tr><td colspan="2"><div class="invalid-feedback d-block">{{ error }}</div></td></tr>
+                {% endfor %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="ti ti-device-floppy me-1"></i>Guardar configuración
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

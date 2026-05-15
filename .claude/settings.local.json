@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/towers/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/apartments/)",
+      "Bash(python manage.py check)",
+      "Bash(.venv/bin/python manage.py makemigrations residents)",
+      "Bash(.venv/bin/python manage.py migrate)",
+      "Bash(.venv/bin/python manage.py seed)",
+      "Bash(python manage.py makemigrations units --name remove_apartment_status)",
+      "Bash(python manage.py migrate)",
+      "Bash(python3 manage.py makemigrations units --name remove_apartment_status)",
+      "Bash(python3 manage.py migrate)"
+    ]
+  }
+}

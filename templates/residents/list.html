@@ -1,0 +1,113 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Residentes{% endblock %}
+{% block page_title %}Residentes{% endblock %}
+{% block nav_residents %}active{% endblock %}
+
+{% block page_actions %}
+  {% if request.user.is_staff or request.user.is_superuser %}
+  <a href="{% url 'residents:invite_create' %}" class="btn btn-outline-primary me-2">
+    <i class="ti ti-mail-forward me-2"></i>Invitar
+  </a>
+  <a href="{% url 'residents:create' %}" class="btn btn-primary">
+    <i class="ti ti-plus me-2"></i>Nuevo residente
+  </a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if request.user.is_staff or request.user.is_superuser %}
+<div class="card mb-3">
+  <div class="card-header p-0">
+    <ul class="nav nav-tabs card-header-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" href="{% url 'residents:list' %}">
+          <i class="ti ti-users me-1"></i>Residentes
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'residents:invitation_list' %}">
+          <i class="ti ti-mail me-1"></i>Invitaciones
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+{% endif %}
+<div class="card">
+  <div class="card-header">
+    <form method="get" class="ms-auto d-flex gap-2">
+      <input type="search" name="q" value="{{ q }}" class="form-control"
+             placeholder="Buscar por nombre, correo, apartamento…">
+      <button class="btn btn-primary" type="submit"><i class="ti ti-search"></i></button>
+      {% if q %}<a href="?" class="btn btn-ghost-secondary"><i class="ti ti-x"></i></a>{% endif %}
+    </form>
+  </div>
+  <div class="card-body p-0">
+    {% if residents %}
+      <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Torre</th>
+              <th>Apartamento</th>
+              <th>Teléfono</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for resident in residents %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center">
+                  <span class="avatar avatar-sm me-2">{{ resident.first_name|first }}{{ resident.last_name|first }}</span>
+                  <div>
+                    <div class="fw-bold">{{ resident.full_name }}</div>
+                    <small class="text-secondary">{{ resident.email }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>{{ resident.get_resident_type_display }}</td>
+              <td>{% for apt in resident.apartments.all %}{{ apt.tower }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td>
+              <td>{% for apt in resident.apartments.all %}{{ apt }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td>
+              <td>{{ resident.phone|default:"—" }}</td>
+              <td>
+                <span class="badge bg-{% if resident.status == 'active' %}success{% else %}secondary{% endif %}-lt">
+                  {{ resident.get_status_display }}
+                </span>
+              </td>
+              <td class="text-end">
+                <a href="{% url 'residents:detail' resident.pk %}" class="btn btn-sm btn-ghost-secondary">
+                  <i class="ti ti-eye"></i>
+                </a>
+                {% if request.user.is_staff or request.user.is_superuser %}
+                <a href="{% url 'residents:edit' resident.pk %}" class="btn btn-sm btn-ghost-secondary">
+                  <i class="ti ti-edit"></i>
+                </a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% include "partials/pagination.html" %}
+    {% else %}
+      <div class="empty">
+        <div class="empty-icon"><i class="ti ti-users"></i></div>
+        <p class="empty-title">Sin residentes registrados</p>
+        {% if request.user.is_staff or request.user.is_superuser %}
+        <div class="empty-action">
+          <a href="{% url 'residents:invite_create' %}" class="btn btn-primary">
+            <i class="ti ti-mail-forward me-2"></i>Invitar residente
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
