@@ -96,6 +96,12 @@ class Issue(models.Model):
             'low': 'ti-arrow-down',
         }.get(self.priority, 'ti-minus')
 
+    @property
+    def resolution_days(self):
+        if self.resolved_at and self.created_at:
+            return (self.resolved_at - self.created_at).days
+        return None
+
 
 class IssueNote(models.Model):
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name='notes')
@@ -109,3 +115,23 @@ class IssueNote(models.Model):
 
     def __str__(self):
         return f'#{self.issue.pk} → {self.status}'
+
+    @property
+    def status_color(self):
+        return {
+            'open': 'red',
+            'in_progress': 'yellow',
+            'resolved': 'green',
+            'closed': 'secondary',
+            'duplicated': 'purple',
+        }.get(self.status, 'secondary')
+
+    @property
+    def status_icon(self):
+        return {
+            'open': 'ti-circle',
+            'in_progress': 'ti-progress',
+            'resolved': 'ti-circle-check',
+            'closed': 'ti-lock',
+            'duplicated': 'ti-copy',
+        }.get(self.status, 'ti-circle')

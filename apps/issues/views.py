@@ -8,7 +8,7 @@ from django.utils import timezone
 PAGE_SIZE = 20
 from apps.core.decorators import staff_required, admin_required
 from .models import Issue, IssueNote
-from .forms import IssueReportForm, IssueAdminForm, IssueAdminEditForm
+from .forms import IssueReportForm, IssueAdminForm, IssueAdminEditForm, IssueQuickUpdateForm
 from .emails import notify_staff_new_issue, notify_staff_issue_reopened, notify_owner_status_changed
 
 
@@ -81,7 +81,42 @@ def issue_list(request):
 def issue_detail(request, pk):
     issue = get_object_or_404(Issue, pk=pk)
     notes = issue.notes.select_related('created_by').all()
-    return render(request, 'issues/detail.html', {'issue': issue, 'notes': notes})
+    is_staff = _is_staff(request.user)
+    resident = getattr(request.user, 'resident', None)
+    can_update = is_staff or (resident and issue.reported_by == resident)
+
+    quick_form = IssueQuickUpdateForm(issue=issue, is_staff=is_staff) if can_update else None
+
+    if request.method == 'POST' and can_update:
+        quick_form = IssueQuickUpdateForm(request.POST, issue=issue, is_staff=is_staff)
+        if quick_form.is_valid():
+            prev_status = issue.status
+            new_status = quick_form.cleaned_data['status']
+            note_body = quick_form.cleaned_data.get('note', '')
+            issue.status = new_status
+            if new_status == 'resolved' and prev_status != 'resolved':
+                issue.resolved_at = timezone.now()
+            issue.save()
+            if new_status != prev_status or note_body:
+                IssueNote.objects.create(
+                    issue=issue, status=new_status,
+                    body=note_body,
+                    created_by=request.user,
+                )
+                if is_staff:
+                    notify_owner_status_changed(request, issue, updated_by=request.user)
+                elif new_status == 'open':
+                    notify_staff_issue_reopened(request, issue, updated_by=request.user)
+            messages.success(request, 'Reporte actualizado.')
+            return redirect('issues:detail', pk=pk)
+
+    return render(request, 'issues/detail.html', {
+        'issue': issue,
+        'notes': notes,
+        'quick_form': quick_form,
+        'can_update': can_update,
+        'is_staff': is_staff,
+    })
 
 
 def _is_staff(user):

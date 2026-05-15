@@ -162,6 +162,5 @@ def manual_staff(request):
     return render(request, 'core/manual_staff.html')
 
 
-@login_required
 def manual_resident(request):
     return render(request, 'core/manual_resident.html')

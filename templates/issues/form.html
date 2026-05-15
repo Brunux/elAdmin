@@ -62,8 +62,8 @@
           <li class="list-group-item">
             <div class="d-flex justify-content-between align-items-center mb-1">
               <span class="fw-medium">{{ note.created_by.get_full_name|default:note.created_by.username|default:"—" }}</span>
-              <span class="badge bg-{% if note.status == 'open' %}success{% elif note.status == 'in_progress' %}blue{% elif note.status == 'resolved' %}secondary{% else %}warning{% endif %}-lt">
-                {{ note.get_status_display }}
+              <span class="badge bg-{{ note.status_color }}-lt">
+                <i class="ti {{ note.status_icon }} me-1"></i>{{ note.get_status_display }}
               </span>
             </div>
             <div class="text-secondary small">{{ note.created_at|date:"d/m/Y H:i" }}</div>

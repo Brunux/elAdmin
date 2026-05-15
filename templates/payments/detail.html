@@ -46,7 +46,7 @@
           <dt class="col-5">Referencia</dt><dd class="col-7">{{ payment.reference|default:"—" }}</dd>
           <dt class="col-5">Estado</dt>
           <dd class="col-7">
-            <span class="badge bg-{{ payment.status_color }}">
+            <span class="badge bg-{{ payment.status_color }}-lt">
               <i class="ti {{ payment.status_icon }} me-1"></i>{{ payment.get_status_display }}
             </span>
           </dd>

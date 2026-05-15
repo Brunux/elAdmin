@@ -5,6 +5,35 @@ from apps.core.mixins import TablerFormMixin
 from .models import Issue
 
 
+class IssueQuickUpdateForm(forms.Form):
+    status = forms.ChoiceField(label='Estado', choices=[])
+    note = forms.CharField(
+        label='Nota',
+        widget=forms.Textarea(attrs={'rows': 2, 'placeholder': 'Agrega una nota (opcional)…'}),
+        required=False,
+    )
+
+    def __init__(self, *args, issue=None, is_staff=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._current_status = issue.status if issue else None
+        if is_staff:
+            self.fields['status'].choices = [
+                c for c in Issue.STATUS_CHOICES if c[0] != 'closed'
+            ]
+        else:
+            self.fields['status'].choices = [
+                c for c in Issue.STATUS_CHOICES if c[0] in ('open', 'closed')
+            ]
+        if issue:
+            self.fields['status'].initial = issue.status
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get('status') != self._current_status and not cleaned.get('note', '').strip():
+            self.add_error('note', 'La nota es obligatoria al cambiar el estado.')
+        return cleaned
+
+
 class IssueReportForm(TablerFormMixin, forms.ModelForm):
     """Form for residents — apartment and reporter are set automatically from the logged-in user."""
 

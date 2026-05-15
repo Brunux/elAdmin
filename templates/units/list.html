@@ -34,7 +34,9 @@
           <tbody>
             {% for apartment in apartments %}
             <tr style="cursor:pointer" onclick="if(!event.target.closest('a,button')){window.location.href='{% url 'units:detail' apartment.pk %}'}">
-              <td class="fw-bold">{{ apartment.number }}</td>
+              <td>
+                <span class="avatar avatar-sm">{{ apartment.number }}</span>
+              </td>
               <td>{{ apartment.tower }}</td>
               <td>{{ apartment.floor }}</td>
               <td>{% if apartment.area_sqm %}{{ apartment.area_sqm }} m²{% else %}—{% endif %}</td>

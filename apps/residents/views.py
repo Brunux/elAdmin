@@ -116,13 +116,16 @@ def invite_create(request):
         accept_url = request.build_absolute_uri(
             reverse('residents:invite_accept', kwargs={'token': invitation.token})
         )
+        manual_url = request.build_absolute_uri(reverse('core:manual_resident'))
         send_mail(
             subject='Invitación para registrarte en El Admin',
             message=(
                 f'Hola,\n\n'
                 f'Has sido invitado a registrarte en El Admin.\n\n'
                 f'Haz clic en el siguiente enlace para completar tu registro:\n{accept_url}\n\n'
-                f'Este enlace es de un solo uso.\n\nSaludos,\nEl Admin'
+                f'Este enlace es de un solo uso.\n\n'
+                f'También puedes consultar el manual del residente antes de ingresar:\n{manual_url}\n\n'
+                f'Saludos,\nEl Admin'
             ),
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[invitation.email],

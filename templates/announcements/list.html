@@ -17,7 +17,7 @@
   <div class="row row-cards">
     {% for ann in announcements %}
     <div class="col-md-6 col-lg-4">
-      <div class="card">
+      <div class="card" style="cursor:pointer" onclick="if(!event.target.closest('a,button')){window.location.href='{% url 'announcements:detail' ann.pk %}'}">
         <div class="card-header">
           <h3 class="card-title">{{ ann.title }}</h3>
           <div class="card-options">
@@ -32,9 +32,6 @@
         <div class="card-footer d-flex align-items-center">
           <small class="text-secondary">{{ ann.created_at|date:"d/m/Y" }} — {{ ann.author|default:"Sistema" }}</small>
           <div class="ms-auto">
-            <a href="{% url 'announcements:detail' ann.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
-              <i class="ti ti-eye"></i>
-            </a>
             {% if request.user.is_staff or request.user.is_superuser %}
             <a href="{% url 'announcements:edit' ann.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
               <i class="ti ti-edit"></i>
