@@ -67,7 +67,7 @@
               <td class="text-secondary">{{ inv.created_at|date:"d/m/Y H:i" }}</td>
               <td>
                 <span class="badge bg-{% if inv.is_used %}success{% else %}warning{% endif %}-lt">
-                  {% if inv.is_used %}Aceptada{% else %}Pendiente{% endif %}
+                  <i class="ti {% if inv.is_used %}ti-check{% else %}ti-clock{% endif %} me-1"></i>{% if inv.is_used %}Aceptada{% else %}Pendiente{% endif %}
                 </span>
               </td>
             </tr>

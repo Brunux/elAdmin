@@ -27,19 +27,39 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
+    from datetime import date
     from apps.units.models import Apartment
     from apps.residents.models import Resident
     from apps.payments.models import Payment
     from apps.announcements.models import Announcement
     from apps.issues.models import Issue
 
+    today = date.today()
+    first_of_month = today.replace(day=1)
+
+    open_issues = Issue.objects.filter(status='open').count()
+    new_issues_month = Issue.objects.filter(created_at__date__gte=first_of_month).count()
+
+    total_residents = Resident.objects.count()
+    active_residents = Resident.objects.filter(status='active').count()
+    new_residents_month = Resident.objects.filter(user__date_joined__date__gte=first_of_month).count()
+
+    total_apartments = Apartment.objects.count()
+    occupied_apartments = Apartment.objects.filter(residents__status='active').distinct().count()
+
+    pending_payments = Payment.objects.filter(status='pending').count()
+    overdue_payments = Payment.objects.filter(status='overdue').count()
+
     context = {
-        'open_issues': Issue.objects.filter(status='open').count(),
-        'total_issues': Issue.objects.count(),
-        'total_apartments': Apartment.objects.count(),
-        'occupied_apartments': Apartment.objects.filter(residents__status='active').distinct().count(),
-        'total_residents': Resident.objects.count(),
-        'pending_payments': Payment.objects.filter(status='pending').count(),
+        'open_issues': open_issues,
+        'new_issues_month': new_issues_month,
+        'total_apartments': total_apartments,
+        'occupied_apartments': occupied_apartments,
+        'total_residents': total_residents,
+        'active_residents': active_residents,
+        'new_residents_month': new_residents_month,
+        'pending_payments': pending_payments,
+        'overdue_payments': overdue_payments,
         'recent_announcements': Announcement.objects.order_by('-created_at')[:5],
     }
     return render(request, 'core/dashboard.html', context)

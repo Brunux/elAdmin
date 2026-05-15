@@ -39,3 +39,23 @@ class Payment(models.Model):
 
     def __str__(self):
         return f'{self.apartment} - {self.period} - ${self.amount}'
+
+    @property
+    def status_color(self):
+        return {
+            'pending': 'warning',
+            'submitted': 'blue',
+            'paid': 'success',
+            'overdue': 'danger',
+            'cancelled': 'secondary',
+        }.get(self.status, 'secondary')
+
+    @property
+    def status_icon(self):
+        return {
+            'pending': 'ti-clock',
+            'submitted': 'ti-upload',
+            'paid': 'ti-check',
+            'overdue': 'ti-alert-triangle',
+            'cancelled': 'ti-x',
+        }.get(self.status, 'ti-circle')

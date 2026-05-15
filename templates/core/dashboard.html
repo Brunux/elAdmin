@@ -46,15 +46,18 @@
   <div class="col-sm-6 col-lg-3">
     <div class="card">
       <div class="card-body">
-        <div class="subheader">Reportes</div>
-        <div class="h1 mb-3 {% if open_issues > 0 %}text-warning{% endif %}">{{ open_issues }}</div>
-        <div><a href="{% url 'issues:list' %}" class="link-secondary">Ver todos <i class="ti ti-arrow-right"></i></a></div>
+        <div class="subheader">Reportes abiertos</div>
+        <div class="h1 mb-1 {% if open_issues > 0 %}text-warning{% endif %}">{{ open_issues }}</div>
+        <div class="text-secondary small mb-2">
+          <i class="ti ti-plus me-1"></i>{{ new_issues_month }} nuevo{% if new_issues_month != 1 %}s{% endif %} este mes
+        </div>
+        <div><a href="{% url 'issues:list' %}?status=open" class="link-secondary">Ver abiertos <i class="ti ti-arrow-right"></i></a></div>
       </div>
       <div class="card-footer">
         <span class="{% if open_issues > 0 %}text-warning{% else %}text-success{% endif %}">
           <i class="ti ti-alert-triangle me-1"></i>
         </span>
-        <span class="text-secondary">{{ open_issues }} abiertos</span>
+        <span class="text-secondary">{{ open_issues }} sin resolver</span>
       </div>
     </div>
   </div>
@@ -62,12 +65,16 @@
     <div class="card">
       <div class="card-body">
         <div class="subheader">Apartamentos</div>
-        <div class="h1 mb-3">{{ total_apartments }}</div>
+        <div class="h1 mb-1">{{ total_apartments }}</div>
+        <div class="text-secondary small mb-2">
+          <i class="ti ti-building-community me-1"></i>{{ occupied_apartments }} de {{ total_apartments }} ocupados
+        </div>
         <div><a href="{% url 'units:list' %}" class="link-secondary">Ver todos <i class="ti ti-arrow-right"></i></a></div>
       </div>
       <div class="card-footer">
-        <span class="text-blue"><i class="ti ti-building-community me-1"></i></span>
-        <span class="text-secondary">{{ occupied_apartments }} ocupados</span>
+        <div class="progress progress-sm" style="height:4px;">
+          <div class="progress-bar bg-blue" style="width: {% if total_apartments %}{% widthratio occupied_apartments total_apartments 100 %}{% else %}0{% endif %}%"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -75,23 +82,33 @@
     <div class="card">
       <div class="card-body">
         <div class="subheader">Residentes</div>
-        <div class="h1 mb-3">{{ total_residents }}</div>
+        <div class="h1 mb-1">{{ total_residents }}</div>
+        <div class="text-secondary small mb-2">
+          <i class="ti ti-user-check me-1"></i>{{ active_residents }} activos{% if new_residents_month %} · +{{ new_residents_month }} este mes{% endif %}
+        </div>
         <div><a href="{% url 'residents:list' %}" class="link-secondary">Ver todos <i class="ti ti-arrow-right"></i></a></div>
       </div>
-      <div class="card-footer"><span class="text-primary"><i class="ti ti-users me-1"></i></span></div>
+      <div class="card-footer">
+        <span class="text-primary"><i class="ti ti-users me-1"></i></span>
+        <span class="text-secondary">{{ active_residents }} activos</span>
+      </div>
     </div>
   </div>
   <div class="col-sm-6 col-lg-3">
     <div class="card">
       <div class="card-body">
         <div class="subheader">Pagos pendientes</div>
-        <div class="h1 mb-3 {% if pending_payments > 0 %}text-danger{% endif %}">{{ pending_payments }}</div>
-        <div><a href="{% url 'payments:list' %}" class="link-secondary">Ver pagos <i class="ti ti-arrow-right"></i></a></div>
+        <div class="h1 mb-1 {% if pending_payments > 0 %}text-warning{% endif %}">{{ pending_payments }}</div>
+        <div class="text-secondary small mb-2">
+          <i class="ti ti-alert-triangle me-1 {% if overdue_payments > 0 %}text-danger{% endif %}"></i>{{ overdue_payments }} vencido{% if overdue_payments != 1 %}s{% endif %}
+        </div>
+        <div><a href="{% url 'payments:list' %}?status=pending" class="link-secondary">Ver pendientes <i class="ti ti-arrow-right"></i></a></div>
       </div>
       <div class="card-footer">
-        <span class="{% if pending_payments > 0 %}text-danger{% else %}text-success{% endif %}">
+        <span class="{% if overdue_payments > 0 %}text-danger{% elif pending_payments > 0 %}text-warning{% else %}text-success{% endif %}">
           <i class="ti ti-cash me-1"></i>
         </span>
+        <span class="text-secondary">{{ pending_payments|add:overdue_payments }} por cobrar</span>
       </div>
     </div>
   </div>
@@ -121,7 +138,7 @@
                   <td>{{ ann.title }}</td>
                   <td>
                     <span class="badge bg-{% if ann.priority == 'urgent' %}red{% elif ann.priority == 'high' %}orange{% elif ann.priority == 'normal' %}blue{% else %}secondary{% endif %}-lt">
-                      {{ ann.get_priority_display }}
+                      <i class="ti {% if ann.priority == 'urgent' %}ti-flame{% elif ann.priority == 'high' %}ti-arrow-up{% elif ann.priority == 'normal' %}ti-minus{% else %}ti-arrow-down{% endif %} me-1"></i>{{ ann.get_priority_display }}
                     </span>
                   </td>
                   <td class="text-secondary">{{ ann.created_at|date:"d/m/Y" }}</td>

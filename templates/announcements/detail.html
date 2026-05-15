@@ -35,7 +35,7 @@
         </div>
         <div class="card-options">
           <span class="badge bg-{% if announcement.priority == 'urgent' %}red{% elif announcement.priority == 'high' %}orange{% elif announcement.priority == 'normal' %}blue{% else %}secondary{% endif %}">
-            {{ announcement.get_priority_display }}
+            <i class="ti {% if announcement.priority == 'urgent' %}ti-flame{% elif announcement.priority == 'high' %}ti-arrow-up{% elif announcement.priority == 'normal' %}ti-minus{% else %}ti-arrow-down{% endif %} me-1"></i>{{ announcement.get_priority_display }}
           </span>
         </div>
       </div>

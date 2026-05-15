@@ -76,7 +76,7 @@
               <td>{{ resident.phone|default:"—" }}</td>
               <td>
                 <span class="badge bg-{% if resident.status == 'active' %}success{% else %}secondary{% endif %}-lt">
-                  {{ resident.get_status_display }}
+                  <i class="ti {% if resident.status == 'active' %}ti-check{% else %}ti-x{% endif %} me-1"></i>{{ resident.get_status_display }}
                 </span>
               </td>
               <td class="text-end">

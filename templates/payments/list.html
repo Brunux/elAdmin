@@ -18,21 +18,25 @@
 
 {% block content %}
 
-<div class="mb-3 d-flex align-items-center gap-2">
-  <form method="get" class="d-flex align-items-center gap-2">
-    {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
-    {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
-    <label class="form-label mb-0 text-nowrap">Periodo:</label>
-    <select name="period" class="form-select w-auto" onchange="this.form.submit()">
-      <option value="">Todos</option>
-      {% for p in all_periods %}
-      <option value="{{ p }}" {% if p == period_filter %}selected{% endif %}>{{ p }}</option>
-      {% endfor %}
-    </select>
-  </form>
-  {% if period_filter %}
-  <a href="?{% if status_filter %}status={{ status_filter }}{% endif %}{% if period_filter %}&period={{ period_filter }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="btn btn-ghost-secondary btn-sm"><i class="ti ti-x"></i></a>
-  {% endif %}
+<div class="card mb-3">
+  <div class="card-header d-flex align-items-center gap-3 flex-wrap">
+    <form method="get" class="d-flex align-items-center gap-2 flex-grow-1">
+      {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+      <span class="text-secondary text-nowrap small">Periodo:</span>
+      <select name="period" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+        <option value="">Todos</option>
+        {% for p in all_periods %}
+        <option value="{{ p }}" {% if p == period_filter %}selected{% endif %}>{{ p }}</option>
+        {% endfor %}
+      </select>
+      <input type="search" name="q" value="{{ q }}" class="form-control form-control-sm"
+             placeholder="Buscar por periodo, referencia, apartamento…">
+      <button class="btn btn-sm btn-primary" type="submit"><i class="ti ti-search"></i></button>
+      {% if q or period_filter %}
+      <a href="?{% if status_filter %}status={{ status_filter }}{% endif %}" class="btn btn-sm btn-ghost-secondary"><i class="ti ti-x"></i></a>
+      {% endif %}
+    </form>
+  </div>
 </div>
 
 <div class="row row-deck mb-4">
@@ -86,18 +90,6 @@
   </div>
 </div>
 
-<div class="card mb-3">
-  <div class="card-header">
-    <form method="get" class="ms-auto d-flex gap-2">
-      {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
-      <input type="search" name="q" value="{{ q }}" class="form-control"
-             placeholder="Buscar por periodo, referencia, apartamento, residente o estado…">
-      <button class="btn btn-primary" type="submit"><i class="ti ti-search"></i></button>
-      {% if q %}<a href="?{% if status_filter %}status={{ status_filter }}{% endif %}" class="btn btn-ghost-secondary"><i class="ti ti-x"></i></a>{% endif %}
-    </form>
-  </div>
-</div>
-
 {% if own_payments %}
 <h3 class="mb-2">Mis pagos</h3>
 <div class="card mb-4">
@@ -119,8 +111,8 @@
             <td>${{ payment.amount }}</td>
             <td>{{ payment.due_date|date:"d/m/Y" }}</td>
             <td>
-              <span class="badge bg-{% if payment.status == 'paid' %}success{% elif payment.status == 'overdue' %}danger{% elif payment.status == 'pending' %}warning{% elif payment.status == 'submitted' %}blue{% else %}secondary{% endif %}-lt">
-                {{ payment.get_status_display }}
+              <span class="badge bg-{{ payment.status_color }}-lt">
+                <i class="ti {{ payment.status_icon }} me-1"></i>{{ payment.get_status_display }}
               </span>
             </td>
             <td class="text-end">
@@ -165,8 +157,8 @@
             <td>${{ payment.amount }}</td>
             <td>{{ payment.due_date|date:"d/m/Y" }}</td>
             <td>
-              <span class="badge bg-{% if payment.status == 'paid' %}success{% elif payment.status == 'overdue' %}danger{% elif payment.status == 'pending' %}warning{% elif payment.status == 'submitted' %}blue{% else %}secondary{% endif %}-lt">
-                {{ payment.get_status_display }}
+              <span class="badge bg-{{ payment.status_color }}-lt">
+                <i class="ti {{ payment.status_icon }} me-1"></i>{{ payment.get_status_display }}
               </span>
             </td>
             <td class="text-end">

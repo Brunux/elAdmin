@@ -69,6 +69,16 @@ class Issue(models.Model):
         }.get(self.status, 'secondary')
 
     @property
+    def status_icon(self):
+        return {
+            'open': 'ti-circle',
+            'in_progress': 'ti-progress',
+            'resolved': 'ti-circle-check',
+            'closed': 'ti-lock',
+            'duplicated': 'ti-copy',
+        }.get(self.status, 'ti-circle')
+
+    @property
     def priority_color(self):
         return {
             'urgent': 'red',
@@ -76,6 +86,15 @@ class Issue(models.Model):
             'normal': 'blue',
             'low': 'secondary',
         }.get(self.priority, 'secondary')
+
+    @property
+    def priority_icon(self):
+        return {
+            'urgent': 'ti-flame',
+            'high': 'ti-arrow-up',
+            'normal': 'ti-minus',
+            'low': 'ti-arrow-down',
+        }.get(self.priority, 'ti-minus')
 
 
 class IssueNote(models.Model):

@@ -22,7 +22,7 @@
           <h3 class="card-title">{{ ann.title }}</h3>
           <div class="card-options">
             <span class="badge bg-{% if ann.priority == 'urgent' %}red{% elif ann.priority == 'high' %}orange{% elif ann.priority == 'normal' %}blue{% else %}secondary{% endif %}">
-              {{ ann.get_priority_display }}
+              <i class="ti {% if ann.priority == 'urgent' %}ti-flame{% elif ann.priority == 'high' %}ti-arrow-up{% elif ann.priority == 'normal' %}ti-minus{% else %}ti-arrow-down{% endif %} me-1"></i>{{ ann.get_priority_display }}
             </span>
           </div>
         </div>
