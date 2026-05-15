@@ -2,7 +2,7 @@
 
 Sistema de administración de edificios residenciales construido con **Django 6** y **Tabler UI**.
 
-Fue creado para dar claridad y empoderar a los residentes, cuantas claras amistades largas.
+Fue creado para dar claridad y empoderar a los residentes, cuentas claras amistades largas.
 
 ## Características
 
