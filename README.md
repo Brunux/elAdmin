@@ -2,6 +2,8 @@
 
 Sistema de administración de edificios residenciales construido con **Django 6** y **Tabler UI**.
 
+Fue creado para dar claridad y empoderar a los residentes, cuantas claras amistades largas.
+
 ## Características
 
 - **Torres y Apartamentos** — Gestión de torres, pisos y unidades con cuotas de mantenimiento configurables por torre.
