@@ -1,4 +1,4 @@
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.contrib.auth.models import User
 from django.urls import reverse
 
@@ -70,17 +70,26 @@ def notify_owner_payment_confirmed(request, payment):
     email = payment.resident.user.email
     if not email:
         return
-    send_mail(
-        subject=f'[El Admin] Pago confirmado — {payment.period}',
-        message=(
-            f'Tu pago ha sido confirmado por la administración.\n\n'
-            f'Apartamento: {payment.apartment}\n'
-            f'Periodo: {payment.period}\n'
-            f'Monto: ${payment.amount}\n'
-            f'Referencia: {payment.reference or "—"}\n\n'
-            f'Ver detalle: {_payment_url(request, payment)}'
-        ),
-        from_email=None,
-        recipient_list=[email],
-        fail_silently=True,
+    from .invoices import generate_invoice
+    invoice = generate_invoice(payment)
+    plain = (
+        f'Tu pago ha sido confirmado por la administración.\n\n'
+        f'Apartamento: {payment.apartment}\n'
+        f'Periodo: {payment.period}\n'
+        f'Monto: ${payment.amount}\n'
+        f'Referencia: {payment.reference or "—"}\n'
+        f'Factura: {invoice.invoice_number}\n\n'
+        f'Ver detalle: {_payment_url(request, payment)}'
     )
+    msg = EmailMultiAlternatives(
+        subject=f'[El Admin] Pago confirmado — {payment.period}',
+        body=plain,
+        from_email=None,
+        to=[email],
+    )
+    msg.attach_alternative(invoice.html_content, 'text/html')
+    msg.fail_silently = True
+    try:
+        msg.send()
+    except Exception:
+        pass

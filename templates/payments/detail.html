@@ -12,6 +12,15 @@
 {% endblock %}
 
 {% block page_actions %}
+  {% if payment.status == 'paid' %}
+    {% with invoice=payment.invoice %}
+    {% if invoice %}
+    <a href="{% url 'payments:invoice' payment.pk %}" target="_blank" class="btn btn-outline-secondary">
+      <i class="ti ti-file-invoice me-2"></i>Ver factura
+    </a>
+    {% endif %}
+    {% endwith %}
+  {% endif %}
   {% if request.user.is_staff or request.user.is_superuser %}
     <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-primary">
       <i class="ti ti-edit me-2"></i>Editar

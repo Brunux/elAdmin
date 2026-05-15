@@ -12,6 +12,40 @@
 
       <div class="card mb-3">
         <div class="card-header">
+          <h3 class="card-title"><i class="ti ti-building-community me-2"></i>Información de la empresa</h3>
+        </div>
+        <div class="card-body">
+          <p class="text-secondary small mb-3">
+            Estos datos aparecen en las facturas generadas al confirmar un pago.
+          </p>
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <label class="form-label">{{ form.company_name.label }}</label>
+              {{ form.company_name }}
+              {% if form.company_name.errors %}<div class="invalid-feedback d-block">{{ form.company_name.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">{{ form.company_rfc.label }}</label>
+              {{ form.company_rfc }}
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">{{ form.company_address.label }}</label>
+              {{ form.company_address }}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ form.company_phone.label }}</label>
+              {{ form.company_phone }}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ form.company_email.label }}</label>
+              {{ form.company_email }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header">
           <h3 class="card-title"><i class="ti ti-calendar-dollar me-2"></i>Generación automática de pagos</h3>
         </div>
         <div class="card-body">

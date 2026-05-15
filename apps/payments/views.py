@@ -7,7 +7,7 @@ from django.db.models import Count
 
 PAGE_SIZE = 20
 from apps.core.decorators import staff_required, admin_required
-from .models import Payment
+from .models import Payment, Invoice
 from .forms import PaymentForm, PaymentResidentCreateForm, PaymentResidentSubmitForm
 from .emails import notify_owner_payment_pending, notify_staff_payment_submitted, notify_owner_payment_confirmed
 
@@ -150,6 +150,17 @@ def payment_edit(request, pk):
 
     title = 'Registrar comprobante' if not is_staff else 'Editar Pago'
     return render(request, 'payments/form.html', {'form': form, 'title': title, 'payment': payment})
+
+
+@login_required
+def payment_invoice(request, pk):
+    from django.http import HttpResponse
+    payment = get_object_or_404(Payment, pk=pk)
+    resident = getattr(request.user, 'resident', None)
+    if not _is_staff(request.user) and (not resident or payment.resident != resident):
+        raise PermissionDenied
+    invoice = get_object_or_404(Invoice, payment=payment)
+    return HttpResponse(invoice.html_content, content_type='text/html')
 
 
 @login_required

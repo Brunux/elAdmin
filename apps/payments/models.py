@@ -59,3 +59,18 @@ class Payment(models.Model):
             'overdue': 'ti-alert-triangle',
             'cancelled': 'ti-x',
         }.get(self.status, 'ti-circle')
+
+
+class Invoice(models.Model):
+    payment = models.OneToOneField(Payment, on_delete=models.CASCADE, related_name='invoice')
+    invoice_number = models.CharField('Número', max_length=50, unique=True)
+    issued_at = models.DateTimeField('Emitida el', auto_now_add=True)
+    html_content = models.TextField('Contenido HTML')
+
+    class Meta:
+        verbose_name = 'Factura'
+        verbose_name_plural = 'Facturas'
+        ordering = ['-issued_at']
+
+    def __str__(self):
+        return self.invoice_number

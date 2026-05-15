@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factura {{ invoice.invoice_number }}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #1a1a2e; background: #f8f9fa; }
+    .page { max-width: 720px; margin: 40px auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+    .header { background: #206bc4; color: #fff; padding: 32px 40px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+    .header .meta { text-align: right; font-size: 13px; opacity: .9; }
+    .header .meta strong { display: block; font-size: 18px; margin-bottom: 4px; }
+    .body { padding: 40px; }
+    .section { margin-bottom: 32px; }
+    .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #6c7a8d; margin-bottom: 12px; border-bottom: 1px solid #e8ecf0; padding-bottom: 8px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .info-item label { display: block; font-size: 11px; color: #6c7a8d; margin-bottom: 2px; }
+    .info-item span { font-weight: 500; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background: #f1f3f8; padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 600; color: #6c7a8d; text-transform: uppercase; letter-spacing: 0.5px; }
+    tbody td { padding: 12px 14px; border-bottom: 1px solid #f1f3f8; }
+    .amount-row td { font-weight: 600; }
+    .total-row { background: #f8f9ff; }
+    .total-row td { font-size: 16px; font-weight: 700; color: #206bc4; border-bottom: none; padding: 16px 14px; }
+    .total-label { text-align: right; }
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; background: #d1fae5; color: #065f46; }
+    .footer { background: #f8f9fa; border-top: 1px solid #e8ecf0; padding: 20px 40px; text-align: center; font-size: 12px; color: #6c7a8d; }
+    @media print {
+      body { background: #fff; }
+      .page { box-shadow: none; margin: 0; border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div>
+        <h1>{{ config.company_name|default:"El Admin" }}</h1>
+        {% if config.company_rfc %}<div style="font-size:13px;opacity:.8;margin-top:4px;">RFC: {{ config.company_rfc }}</div>{% endif %}
+        {% if config.company_address %}<div style="font-size:12px;opacity:.75;margin-top:4px;max-width:320px;">{{ config.company_address }}</div>{% endif %}
+        {% if config.company_phone or config.company_email %}
+        <div style="font-size:12px;opacity:.75;margin-top:4px;">
+          {% if config.company_phone %}Tel: {{ config.company_phone }}{% endif %}
+          {% if config.company_phone and config.company_email %} &nbsp;·&nbsp; {% endif %}
+          {% if config.company_email %}{{ config.company_email }}{% endif %}
+        </div>
+        {% endif %}
+      </div>
+      <div class="meta">
+        <strong>FACTURA</strong>
+        {{ invoice.invoice_number }}<br>
+        Emitida: {{ invoice.issued_at|date:"d/m/Y" }}
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="section">
+        <div class="section-title">Información del pago</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Torre</label>
+            <span>{{ payment.apartment.tower }}</span>
+          </div>
+          <div class="info-item">
+            <label>Apartamento</label>
+            <span>{{ payment.apartment }}</span>
+          </div>
+          <div class="info-item">
+            <label>Residente</label>
+            <span>{{ payment.resident|default:"—" }}</span>
+          </div>
+          <div class="info-item">
+            <label>Periodo</label>
+            <span>{{ payment.period }}</span>
+          </div>
+          <div class="info-item">
+            <label>Tipo de pago</label>
+            <span>{{ payment.get_payment_type_display }}</span>
+          </div>
+          <div class="info-item">
+            <label>Referencia</label>
+            <span>{{ payment.reference|default:"—" }}</span>
+          </div>
+          <div class="info-item">
+            <label>Fecha de pago</label>
+            <span>{{ payment.paid_date|date:"d/m/Y"|default:"—" }}</span>
+          </div>
+          <div class="info-item">
+            <label>Estado</label>
+            <span class="status-badge">Pagado</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Detalle</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th>Periodo</th>
+              <th style="text-align:right;">Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="amount-row">
+              <td>{{ payment.get_payment_type_display }}</td>
+              <td>{{ payment.period }}</td>
+              <td style="text-align:right;">${{ payment.amount }}</td>
+            </tr>
+            {% if payment.notes %}
+            <tr>
+              <td colspan="3" style="color:#6c7a8d;font-size:13px;">{{ payment.notes }}</td>
+            </tr>
+            {% endif %}
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="2" class="total-label">Total pagado</td>
+              <td style="text-align:right;">${{ payment.amount }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer">
+      Este documento es un comprobante de pago oficial emitido por El Admin. &nbsp;·&nbsp; {{ invoice.issued_at|date:"d/m/Y H:i" }}
+    </div>
+  </div>
+</body>
+</html>

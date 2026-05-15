@@ -4,6 +4,13 @@ from apps.towers.models import Tower
 
 
 class SiteConfiguration(models.Model):
+    # Company / invoice info
+    company_name = models.CharField('Razón social', max_length=200, blank=True)
+    company_rfc = models.CharField('RFC', max_length=50, blank=True)
+    company_address = models.TextField('Dirección', blank=True)
+    company_phone = models.CharField('Teléfono', max_length=50, blank=True)
+    company_email = models.EmailField('Correo', blank=True)
+
     # Monthly payment generation
     auto_payments_enabled = models.BooleanField('Generar pagos automáticamente', default=False)
     payment_due_day = models.PositiveSmallIntegerField(

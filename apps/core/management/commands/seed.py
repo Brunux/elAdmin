@@ -11,6 +11,7 @@ class Command(BaseCommand):
         self.stdout.write('Seeding database...')
 
         self._create_users()
+        self._create_site_config()
         towers = self._create_towers()
         apartments = self._create_apartments(towers)
         residents = self._create_residents(apartments)
@@ -21,6 +22,18 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Done.'))
 
     # ------------------------------------------------------------------
+    def _create_site_config(self):
+        from apps.siteconfig.models import SiteConfiguration
+        config = SiteConfiguration.get()
+        if not config.company_name:
+            config.company_name = 'Administradora Residencial El Admin S.A. de C.V.'
+            config.company_rfc = 'ARE230101ABC'
+            config.company_address = 'Av. Reforma 123, Col. Centro, Ciudad de México, CDMX, CP 06600'
+            config.company_phone = '+52 55 1234 5678'
+            config.company_email = 'admin@eladmin.local'
+            config.save()
+            self.stdout.write('  created site config company info')
+
     def _create_users(self):
         if not User.objects.filter(username='admin').exists():
             User.objects.create_superuser('admin', 'admin@eladmin.local', 'admin123',
@@ -100,11 +113,11 @@ class Command(BaseCommand):
             (2, '303', 3, 'vacant',      85.0, 2100),
         ]
         apartments = []
-        for t_idx, number, floor, status, area, fee in apts_data:
+        for t_idx, number, floor, _status, area, fee in apts_data:
             apt, created = Apartment.objects.get_or_create(
                 tower=towers[t_idx],
                 number=number,
-                defaults=dict(floor=floor, status=status, area_sqm=area, monthly_fee=fee),
+                defaults=dict(floor=floor, area_sqm=area, monthly_fee=fee),
             )
             apartments.append(apt)
             if created:
@@ -176,13 +189,14 @@ class Command(BaseCommand):
 
     def _create_payments(self, apartments, residents):
         from apps.payments.models import Payment
+        from apps.payments.invoices import generate_invoice
         today = date.today()
 
-        occupied_apts = [apt for apt in apartments if apt.status == 'occupied']
         apt_to_res = {}
         for res in residents:
             for apt in res.apartments.all():
                 apt_to_res[apt.pk] = res
+        occupied_apts = [apt for apt in apartments if apt.pk in apt_to_res]
 
         for months_ago in range(6, 0, -1):
             period_date = today.replace(day=1) - timedelta(days=30 * months_ago)
@@ -206,7 +220,7 @@ class Command(BaseCommand):
                         status = 'pending'
                     paid_date = None
 
-                _, created = Payment.objects.get_or_create(
+                payment, created = Payment.objects.get_or_create(
                     apartment=apt,
                     period=period,
                     payment_type='maintenance',
@@ -222,6 +236,9 @@ class Command(BaseCommand):
                 )
                 if created:
                     self.stdout.write(f'  created payment {apt} {period}')
+                if payment.status == 'paid' and not hasattr(payment, 'invoice'):
+                    generate_invoice(payment)
+                    self.stdout.write(f'  created invoice for {apt} {period}')
 
     def _create_announcements(self):
         from apps.announcements.models import Announcement
