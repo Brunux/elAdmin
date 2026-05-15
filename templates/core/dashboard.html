@@ -164,4 +164,76 @@
   </div>
 </div>
 
+<div class="row row-deck mt-4">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-cash me-2"></i>Pagos por estado</h3>
+        <div class="card-options">
+          <a href="{% url 'payments:list' %}" class="btn btn-sm btn-ghost-secondary">Ver todos</a>
+        </div>
+      </div>
+      <div class="card-body d-flex align-items-center justify-content-center" style="min-height:220px;">
+        <canvas id="chartPayments"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-alert-circle me-2"></i>Reportes por estado</h3>
+        <div class="card-options">
+          <a href="{% url 'issues:list' %}" class="btn btn-sm btn-ghost-secondary">Ver todos</a>
+        </div>
+      </div>
+      <div class="card-body d-flex align-items-center justify-content-center" style="min-height:220px;">
+        <canvas id="chartIssues"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var donutOpts = { plugins: { legend: { position: 'bottom' } }, cutout: '70%' };
+
+  new Chart(document.getElementById('chartPayments'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Pendiente', 'En revisión', 'Pagado', 'Vencido', 'Cancelado'],
+      datasets: [{
+        data: [
+          {{ payment_counts.pending }}, {{ payment_counts.submitted }},
+          {{ payment_counts.paid }},    {{ payment_counts.overdue }},
+          {{ payment_counts.cancelled }}
+        ],
+        backgroundColor: ['#f59f00', '#206bc4', '#2fb344', '#d63939', '#adb5bd'],
+        borderWidth: 0,
+      }]
+    },
+    options: donutOpts,
+  });
+
+  new Chart(document.getElementById('chartIssues'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Abierto', 'En proceso', 'Resuelto', 'Duplicado', 'Cerrado'],
+      datasets: [{
+        data: [
+          {{ issue_counts.open }},       {{ issue_counts.in_progress }},
+          {{ issue_counts.resolved }},   {{ issue_counts.duplicated }},
+          {{ issue_counts.closed }}
+        ],
+        backgroundColor: ['#d63939', '#f59f00', '#2fb344', '#ae3ec9', '#adb5bd'],
+        borderWidth: 0,
+      }]
+    },
+    options: donutOpts,
+  });
+});
+</script>
 {% endblock %}

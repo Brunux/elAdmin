@@ -50,6 +50,15 @@ def dashboard(request):
     pending_payments = Payment.objects.filter(status='pending').count()
     overdue_payments = Payment.objects.filter(status='overdue').count()
 
+    payment_counts = {
+        s: Payment.objects.filter(status=s).count()
+        for s in ['pending', 'submitted', 'paid', 'overdue', 'cancelled']
+    }
+    issue_counts = {
+        s: Issue.objects.filter(status=s).count()
+        for s in ['open', 'in_progress', 'resolved', 'duplicated', 'closed']
+    }
+
     context = {
         'open_issues': open_issues,
         'new_issues_month': new_issues_month,
@@ -60,6 +69,8 @@ def dashboard(request):
         'new_residents_month': new_residents_month,
         'pending_payments': pending_payments,
         'overdue_payments': overdue_payments,
+        'payment_counts': payment_counts,
+        'issue_counts': issue_counts,
         'recent_announcements': Announcement.objects.order_by('-created_at')[:5],
     }
     return render(request, 'core/dashboard.html', context)
