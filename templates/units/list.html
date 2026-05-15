@@ -40,11 +40,11 @@
               <td>{% if apartment.area_sqm %}{{ apartment.area_sqm }} m²{% else %}—{% endif %}</td>
               <td>${{ apartment.monthly_fee }}</td>
               <td class="text-end">
-                <a href="{% url 'units:detail' apartment.pk %}" class="btn btn-sm btn-ghost-secondary">
+                <a href="{% url 'units:detail' apartment.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
                   <i class="ti ti-eye"></i>
                 </a>
                 {% if request.user.is_staff or request.user.is_superuser %}
-                <a href="{% url 'units:edit' apartment.pk %}" class="btn btn-sm btn-ghost-secondary">
+                <a href="{% url 'units:edit' apartment.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
                   <i class="ti ti-edit"></i>
                 </a>
                 {% endif %}

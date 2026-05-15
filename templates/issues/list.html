@@ -97,10 +97,10 @@
             <td><span class="badge bg-{{ issue.status_color }}-lt">{{ issue.get_status_display }}</span></td>
             <td class="text-secondary">{{ issue.created_at|date:"d/m/Y" }}</td>
             <td class="text-end">
-              <a href="{% url 'issues:detail' issue.pk %}" class="btn btn-sm btn-ghost-secondary">
+              <a href="{% url 'issues:detail' issue.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
                 <i class="ti ti-eye"></i>
               </a>
-              <a href="{% url 'issues:edit' issue.pk %}" class="btn btn-sm btn-ghost-secondary">
+              <a href="{% url 'issues:edit' issue.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
                 <i class="ti ti-edit"></i>
               </a>
             </td>
@@ -138,11 +138,11 @@
             <td><span class="badge bg-{{ issue.status_color }}-lt">{{ issue.get_status_display }}</span></td>
             <td class="text-secondary">{{ issue.created_at|date:"d/m/Y" }}</td>
             <td class="text-end">
-              <a href="{% url 'issues:detail' issue.pk %}" class="btn btn-sm btn-ghost-secondary">
+              <a href="{% url 'issues:detail' issue.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
                 <i class="ti ti-eye"></i>
               </a>
               {% if request.user.is_staff or request.user.is_superuser %}
-              <a href="{% url 'issues:edit' issue.pk %}" class="btn btn-sm btn-ghost-secondary">
+              <a href="{% url 'issues:edit' issue.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
                 <i class="ti ti-edit"></i>
               </a>
               {% endif %}

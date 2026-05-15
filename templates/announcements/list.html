@@ -32,18 +32,22 @@
         <div class="card-footer d-flex align-items-center">
           <small class="text-secondary">{{ ann.created_at|date:"d/m/Y" }} — {{ ann.author|default:"Sistema" }}</small>
           <div class="ms-auto">
-            <a href="{% url 'announcements:detail' ann.pk %}" class="btn btn-sm btn-ghost-secondary">
+            <a href="{% url 'announcements:detail' ann.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
               <i class="ti ti-eye"></i>
             </a>
             {% if request.user.is_staff or request.user.is_superuser %}
-            <a href="{% url 'announcements:edit' ann.pk %}" class="btn btn-sm btn-ghost-secondary">
+            <a href="{% url 'announcements:edit' ann.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
               <i class="ti ti-edit"></i>
             </a>
             {% endif %}
             {% if request.user.is_superuser %}
-            <a href="{% url 'announcements:delete' ann.pk %}" class="btn btn-sm btn-ghost-danger">
+            <button type="button" class="btn btn-sm btn-ghost-danger"
+                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                    data-action="{% url 'announcements:delete' ann.pk %}"
+                    data-title="{{ ann.title }}"
+                    title="Eliminar">
               <i class="ti ti-trash"></i>
-            </a>
+            </button>
             {% endif %}
           </div>
         </div>

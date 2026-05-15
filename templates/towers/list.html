@@ -136,14 +136,18 @@ document.addEventListener('DOMContentLoaded', function () {
           <h3 class="card-title"><i class="ti ti-building-skyscraper me-2 text-blue"></i>{{ tower }}</h3>
           <div class="card-options">
             {% if request.user.is_staff or request.user.is_superuser %}
-            <a href="{% url 'towers:edit' tower.pk %}" class="btn btn-sm btn-ghost-secondary">
+            <a href="{% url 'towers:edit' tower.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
               <i class="ti ti-edit"></i>
             </a>
             {% endif %}
             {% if request.user.is_superuser %}
-            <a href="{% url 'towers:delete' tower.pk %}" class="btn btn-sm btn-ghost-danger">
+            <button type="button" class="btn btn-sm btn-ghost-danger"
+                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                    data-action="{% url 'towers:delete' tower.pk %}"
+                    data-title="{{ tower }}"
+                    title="Eliminar">
               <i class="ti ti-trash"></i>
-            </a>
+            </button>
             {% endif %}
           </div>
         </div>

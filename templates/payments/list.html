@@ -124,11 +124,11 @@
               </span>
             </td>
             <td class="text-end">
-              <a href="{% url 'payments:detail' payment.pk %}" class="btn btn-sm btn-ghost-secondary">
+              <a href="{% url 'payments:detail' payment.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
                 <i class="ti ti-eye"></i>
               </a>
               {% if payment.status in 'pending overdue' %}
-              <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-ghost-primary" title="Registrar comprobante">
+              <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-ghost-primary" data-bs-toggle="tooltip" title="Registrar comprobante">
                 <i class="ti ti-upload"></i>
               </a>
               {% endif %}
@@ -170,11 +170,11 @@
               </span>
             </td>
             <td class="text-end">
-              <a href="{% url 'payments:detail' payment.pk %}" class="btn btn-sm btn-ghost-secondary">
+              <a href="{% url 'payments:detail' payment.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
                 <i class="ti ti-eye"></i>
               </a>
               {% if request.user.is_staff or request.user.is_superuser %}
-              <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-ghost-secondary">
+              <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
                 <i class="ti ti-edit"></i>
               </a>
               {% endif %}

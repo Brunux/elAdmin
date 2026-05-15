@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="navbar navbar-expand-md d-print-none">
+<div class="navbar navbar-expand-md d-print-none" data-bs-theme="dark" style="background-color: #1c2c4c;">
   <div class="container-xl">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu">
       <span class="navbar-toggler-icon"></span>
@@ -163,4 +163,56 @@
     </div>
   </footer>
 </div>
+
+<!-- Delete confirmation modal (shared) -->
+<div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="modal-title fw-bold mb-1">¿Confirmar eliminación?</div>
+        <div class="text-secondary">¿Estás seguro de que deseas eliminar <strong id="deleteItemName"></strong>? Esta acción no se puede deshacer.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Cancelar</button>
+        <form id="deleteModalForm" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">
+            <i class="ti ti-trash me-1"></i>Eliminar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block layout_js %}
+<script>
+(function () {
+  // Colored letter avatars
+  var palette = ['#206bc4','#2fb344','#ae3ec9','#f76707','#d63939','#0ca678','#4299e1','#f59f00','#e8590c','#74b816'];
+  document.querySelectorAll('.avatar').forEach(function (el) {
+    var ch = el.textContent.trim().charAt(0).toUpperCase();
+    if (ch) {
+      el.style.backgroundColor = palette[ch.charCodeAt(0) % palette.length];
+      el.style.color = '#fff';
+    }
+  });
+
+  // Bootstrap tooltips
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+    new bootstrap.Tooltip(el, { trigger: 'hover' });
+  });
+
+  // Delete modal — set form action and item name from button data attributes
+  var deleteModal = document.getElementById('deleteModal');
+  if (deleteModal) {
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+      var btn = event.relatedTarget;
+      document.getElementById('deleteModalForm').action = btn.dataset.action;
+      document.getElementById('deleteItemName').textContent = btn.dataset.title || 'este elemento';
+    });
+  }
+})();
+</script>
 {% endblock %}

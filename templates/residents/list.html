@@ -80,11 +80,11 @@
                 </span>
               </td>
               <td class="text-end">
-                <a href="{% url 'residents:detail' resident.pk %}" class="btn btn-sm btn-ghost-secondary">
+                <a href="{% url 'residents:detail' resident.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Ver detalle">
                   <i class="ti ti-eye"></i>
                 </a>
                 {% if request.user.is_staff or request.user.is_superuser %}
-                <a href="{% url 'residents:edit' resident.pk %}" class="btn btn-sm btn-ghost-secondary">
+                <a href="{% url 'residents:edit' resident.pk %}" class="btn btn-sm btn-ghost-secondary" data-bs-toggle="tooltip" title="Editar">
                   <i class="ti ti-edit"></i>
                 </a>
                 {% endif %}
