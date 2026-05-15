@@ -1,0 +1,152 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Manual — Staff{% endblock %}
+{% block page_title %}Manual de Staff{% endblock %}
+{% block nav_manual %}active{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'core:manual_index' %}">Manual</a></li>
+  <li class="breadcrumb-item active">Staff</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-3 mb-4">
+    <div class="card sticky-top" style="top:1rem">
+      <div class="card-header"><h4 class="card-title">Contenido</h4></div>
+      <div class="list-group list-group-flush">
+        <a href="#inicio" class="list-group-item list-group-item-action">Inicio de sesión</a>
+        <a href="#dashboard" class="list-group-item list-group-item-action">Dashboard</a>
+        <a href="#residentes" class="list-group-item list-group-item-action">Residentes</a>
+        <a href="#invitaciones" class="list-group-item list-group-item-action">Invitaciones</a>
+        <a href="#pagos" class="list-group-item list-group-item-action">Pagos</a>
+        <a href="#reportes" class="list-group-item list-group-item-action">Reportes</a>
+        <a href="#anuncios" class="list-group-item list-group-item-action">Anuncios</a>
+        <a href="#cuenta" class="list-group-item list-group-item-action">Mi cuenta</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9">
+
+    <div class="card mb-4" id="inicio">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-login me-2 text-blue"></i>Inicio de sesión</h3></div>
+      <div class="card-body">
+        <p>Accede con tu correo electrónico y contraseña. Como staff tienes acceso a la gestión operativa del edificio: residentes, pagos, reportes y anuncios.</p>
+        <div class="alert alert-info">
+          <i class="ti ti-info-circle me-2"></i>El staff <strong>no puede</strong> eliminar registros ni acceder a la sección de Configuración. Para esas acciones contacta al administrador.
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="dashboard">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-layout-dashboard me-2 text-blue"></i>Dashboard</h3></div>
+      <div class="card-body">
+        <p>La pantalla principal muestra un resumen del estado del edificio:</p>
+        <ul>
+          <li><strong>Reportes abiertos</strong> — incidencias que requieren atención.</li>
+          <li><strong>Apartamentos</strong> — total y cuántos están ocupados.</li>
+          <li><strong>Residentes</strong> — total registrados.</li>
+          <li><strong>Pagos pendientes</strong> — pagos que aún no han sido cubiertos.</li>
+          <li><strong>Anuncios recientes</strong> — últimas comunicaciones publicadas.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="residentes">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-users me-2 text-blue"></i>Residentes</h3></div>
+      <div class="card-body">
+        <p>Consulta y gestiona el directorio de residentes.</p>
+        <ul>
+          <li>Busca residentes por nombre, correo, teléfono, número de apartamento o torre.</li>
+          <li>Crea nuevos residentes ingresando sus datos directamente.</li>
+          <li>Edita información personal, tipo de residente, apartamentos asignados y fechas de ingreso.</li>
+          <li>Un residente puede ser <strong>Propietario</strong> o <strong>Inquilino</strong> y tener múltiples apartamentos.</li>
+        </ul>
+        <div class="alert alert-warning">
+          <i class="ti ti-alert-triangle me-2"></i>La <strong>eliminación</strong> de residentes solo puede realizarla el administrador.
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="invitaciones">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-mail-forward me-2 text-blue"></i>Invitaciones</h3></div>
+      <div class="card-body">
+        <p>Envía invitaciones para que los residentes se registren ellos mismos.</p>
+        <ol>
+          <li>Ve a <strong>Residentes → Invitar residente</strong> (botón en la esquina superior derecha del dashboard).</li>
+          <li>Ingresa el correo del residente.</li>
+          <li>Selecciona el tipo de residente: <em>Propietario</em> o <em>Inquilino</em>. El selector de apartamento se actualizará mostrando solo los disponibles para ese tipo.</li>
+          <li>Selecciona el apartamento y envía la invitación.</li>
+        </ol>
+        <p>El residente recibirá un correo con un enlace de un solo uso para completar su registro. Puedes ver el historial de invitaciones enviadas desde el mismo formulario.</p>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="pagos">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-cash me-2 text-blue"></i>Pagos</h3></div>
+      <div class="card-body">
+        <p>Supervisa y gestiona los pagos de mantenimiento.</p>
+        <h4>Filtros</h4>
+        <ul>
+          <li>Filtra por <strong>periodo</strong> usando el selector en la parte superior. Los contadores de estado se actualizan según el periodo seleccionado.</li>
+          <li>Filtra por <strong>estado</strong> haciendo clic en los recuadros de colores: Pendiente, En revisión, Pagado, Vencido, Cancelado.</li>
+        </ul>
+        <h4 class="mt-3">Confirmar un pago</h4>
+        <ol>
+          <li>Cuando un residente sube su comprobante, el pago pasa a estado <em>En revisión</em>.</li>
+          <li>Abre el pago y revisa el comprobante adjunto.</li>
+          <li>Si es válido, haz clic en <strong>Confirmar pago</strong> (botón verde en el formulario de edición). El estado cambiará a <em>Pagado</em> y se notificará al residente.</li>
+        </ol>
+        <h4 class="mt-3">Registrar un pago manualmente</h4>
+        <p>Usa el botón <strong>Registrar pago</strong> para crear un pago directamente con todos los datos, sin necesidad de que el residente lo suba.</p>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="reportes">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-alert-circle me-2 text-blue"></i>Reportes de incidencias</h3></div>
+      <div class="card-body">
+        <p>Gestiona los reportes de problemas en el edificio.</p>
+        <h4>Estados disponibles para staff</h4>
+        <ul>
+          <li><span class="badge bg-red-lt">Abierto</span> — reporte recién creado, pendiente de atención.</li>
+          <li><span class="badge bg-yellow-lt">En proceso</span> — se está trabajando en la solución.</li>
+          <li><span class="badge bg-green-lt">Resuelto</span> — el problema fue solucionado.</li>
+          <li><span class="badge bg-purple-lt">Duplicado</span> — ya existe otro reporte para el mismo problema. Debes seleccionar el reporte original.</li>
+        </ul>
+        <div class="alert alert-info mt-3">
+          <i class="ti ti-info-circle me-2"></i>El staff <strong>no puede</strong> marcar un reporte como <em>Cerrado</em>. Solo el residente puede cerrarlo. Tampoco puede modificar el apartamento, reportado por, título ni descripción del reporte original.
+        </div>
+        <h4 class="mt-3">Notas</h4>
+        <p>Cada actualización debe incluir una nota explicando el cambio. Todas las notas quedan registradas en el historial del reporte y se envía notificación por correo al residente.</p>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="anuncios">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-speakerphone me-2 text-blue"></i>Anuncios</h3></div>
+      <div class="card-body">
+        <p>Crea y gestiona comunicados para los residentes del edificio.</p>
+        <ul>
+          <li>Asigna una <strong>prioridad</strong>: Normal, Alta o Urgente.</li>
+          <li>Los anuncios recientes aparecen en el Dashboard de todos los usuarios.</li>
+          <li>Puedes editar o eliminar anuncios existentes.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="cuenta">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-user me-2 text-blue"></i>Mi cuenta</h3></div>
+      <div class="card-body">
+        <p>Accede a tu perfil desde el menú superior derecho → <strong>Mi cuenta</strong>.</p>
+        <ul>
+          <li>Edita tu nombre y correo electrónico. Un cambio de correo envía una notificación de confirmación.</li>
+          <li>Cambia tu contraseña desde la pestaña <em>Contraseña</em>.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -109,6 +109,14 @@
             </a>
           </li>
           {% endif %}
+          <li class="nav-item {% block nav_manual %}{% endblock %}">
+            <a class="nav-link" href="{% url 'core:manual_index' %}">
+              <span class="nav-link-icon d-md-none d-lg-inline-block">
+                <i class="ti ti-book"></i>
+              </span>
+              <span class="nav-link-title">Manual</span>
+            </a>
+          </li>
         </ul>
       </div>
     </div>

@@ -1,0 +1,155 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Manual — Administrador{% endblock %}
+{% block page_title %}Manual de Administrador{% endblock %}
+{% block nav_manual %}active{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'core:manual_index' %}">Manual</a></li>
+  <li class="breadcrumb-item active">Administrador</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-3 mb-4">
+    <div class="card sticky-top" style="top:1rem">
+      <div class="card-header"><h4 class="card-title">Contenido</h4></div>
+      <div class="list-group list-group-flush">
+        <a href="#inicio" class="list-group-item list-group-item-action">Inicio de sesión</a>
+        <a href="#torres" class="list-group-item list-group-item-action">Torres y apartamentos</a>
+        <a href="#residentes" class="list-group-item list-group-item-action">Residentes</a>
+        <a href="#invitaciones" class="list-group-item list-group-item-action">Invitaciones</a>
+        <a href="#pagos" class="list-group-item list-group-item-action">Pagos</a>
+        <a href="#reportes" class="list-group-item list-group-item-action">Reportes</a>
+        <a href="#anuncios" class="list-group-item list-group-item-action">Anuncios</a>
+        <a href="#configuracion" class="list-group-item list-group-item-action">Configuración</a>
+        <a href="#cuenta" class="list-group-item list-group-item-action">Mi cuenta</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9">
+
+    <div class="card mb-4" id="inicio">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-login me-2 text-purple"></i>Inicio de sesión</h3></div>
+      <div class="card-body">
+        <p>Accede al sistema con tu correo electrónico y contraseña en la página de inicio. Como administrador tienes acceso completo a todas las funciones del sistema.</p>
+        <div class="alert alert-purple">
+          <i class="ti ti-shield-crown me-2"></i>El rol de <strong>Administrador</strong> es el único que puede acceder a la sección de Configuración y eliminar registros del sistema.
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="torres">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-building-skyscraper me-2 text-purple"></i>Torres y Apartamentos</h3></div>
+      <div class="card-body">
+        <h4>Torres</h4>
+        <p>Desde <strong>Torres</strong> en el menú puedes ver el resumen de pagos por torre, filtrar por periodo y ver qué propietario e inquilino ocupa cada apartamento.</p>
+        <ul>
+          <li>Crea torres con nombre, número y número de pisos.</li>
+          <li>Edita o elimina torres existentes.</li>
+          <li>Visualiza gráficas de pagos por estado y monto mensual.</li>
+        </ul>
+        <h4 class="mt-3">Apartamentos</h4>
+        <p>Desde <strong>Apartamentos</strong> gestiona las unidades de cada torre.</p>
+        <ul>
+          <li>Al crear un apartamento, selecciona la torre y el piso.</li>
+          <li>La <strong>cuota de mantenimiento mensual</strong> se toma automáticamente del monto configurado por torre. Activa la casilla <em>Cuota personalizada</em> para establecer un monto diferente.</li>
+          <li>Solo el administrador puede eliminar apartamentos.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="residentes">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-users me-2 text-purple"></i>Residentes</h3></div>
+      <div class="card-body">
+        <p>Gestiona el directorio completo de residentes del edificio.</p>
+        <ul>
+          <li>Un residente puede ser <strong>Propietario</strong> o <strong>Inquilino</strong> y tener uno o más apartamentos asignados.</li>
+          <li>Puedes crear residentes directamente o mediante invitación por correo.</li>
+          <li>Edita datos personales, fechas de ingreso/salida, foto y contacto de emergencia.</li>
+          <li>Solo el administrador puede eliminar residentes.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="invitaciones">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-mail-forward me-2 text-purple"></i>Invitaciones</h3></div>
+      <div class="card-body">
+        <p>Invita a nuevos residentes para que completen su propio registro.</p>
+        <ol>
+          <li>Ve a <strong>Residentes → Invitar residente</strong>.</li>
+          <li>Ingresa el correo, selecciona el tipo de residente y el apartamento correspondiente.</li>
+          <li>El sistema envía un correo con un enlace de un solo uso.</li>
+          <li>El residente completa nombre y contraseña. Si ya tiene cuenta, el apartamento se añade automáticamente.</li>
+        </ol>
+        <p>Consulta el historial de invitaciones enviadas desde el mismo formulario.</p>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="pagos">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-cash me-2 text-purple"></i>Pagos</h3></div>
+      <div class="card-body">
+        <p>Administra los pagos de mantenimiento de todos los residentes.</p>
+        <ul>
+          <li>Filtra pagos por <strong>estado</strong> (pendiente, en revisión, pagado, vencido, cancelado) y <strong>periodo</strong>.</li>
+          <li>Registra pagos manualmente o deja que el sistema los genere automáticamente cada mes.</li>
+          <li>Cuando un residente sube su comprobante, el pago pasa a <em>En revisión</em>. Usa el botón <strong>Confirmar pago</strong> para marcarlo como pagado.</li>
+          <li>La generación automática y la revisión de vencidos se activan en <strong>Configuración</strong>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="reportes">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-alert-circle me-2 text-purple"></i>Reportes de incidencias</h3></div>
+      <div class="card-body">
+        <p>Supervisa todos los reportes de incidencias del edificio.</p>
+        <ul>
+          <li>Los reportes pueden tener estado: <em>Abierto, En proceso, Resuelto, Cerrado, Duplicado</em>.</li>
+          <li>Al marcar un reporte como <strong>Duplicado</strong>, debes seleccionar el reporte original.</li>
+          <li>Los residentes solo pueden establecer estado <em>Abierto</em> o <em>Cerrado</em>.</li>
+          <li>El apartamento, reportado por, título y descripción no pueden ser modificados por staff o administrador una vez creado el reporte.</li>
+          <li>Cada cambio de estado genera una nota en el historial y envía notificación por correo.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="anuncios">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-speakerphone me-2 text-purple"></i>Anuncios</h3></div>
+      <div class="card-body">
+        <p>Publica comunicados para todos los residentes.</p>
+        <ul>
+          <li>Asigna prioridad: <em>Normal, Alta, Urgente</em>.</li>
+          <li>Los anuncios recientes aparecen en el Dashboard.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="configuracion">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-settings me-2 text-purple"></i>Configuración</h3></div>
+      <div class="card-body">
+        <p>Sección exclusiva del administrador. Desde aquí puedes:</p>
+        <ul>
+          <li><strong>Generación automática de pagos</strong> — activa o desactiva la creación mensual de registros de pago el día 1 de cada mes. Configura el tipo de pago y el día de vencimiento.</li>
+          <li><strong>Revisión de pagos vencidos</strong> — activa la tarea diaria que marca como <em>Vencido</em> los pagos pendientes cuya fecha límite ya pasó.</li>
+          <li><strong>Monto de mantenimiento predeterminado por torre</strong> — define la cuota base que se asigna a los apartamentos de cada torre al crearlos.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="cuenta">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-user me-2 text-purple"></i>Mi cuenta</h3></div>
+      <div class="card-body">
+        <p>Accede a tu perfil desde el menú superior derecho → <strong>Mi cuenta</strong>.</p>
+        <ul>
+          <li>Edita tu nombre y correo electrónico. Un cambio de correo envía una notificación de confirmación.</li>
+          <li>Cambia tu contraseña desde la pestaña <em>Contraseña</em>.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

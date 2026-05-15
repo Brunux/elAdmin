@@ -1,0 +1,147 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Manual — Residente{% endblock %}
+{% block page_title %}Manual de Residente{% endblock %}
+{% block nav_manual %}active{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'core:manual_index' %}">Manual</a></li>
+  <li class="breadcrumb-item active">Residente</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-3 mb-4">
+    <div class="card sticky-top" style="top:1rem">
+      <div class="card-header"><h4 class="card-title">Contenido</h4></div>
+      <div class="list-group list-group-flush">
+        <a href="#inicio" class="list-group-item list-group-item-action">Inicio de sesión</a>
+        <a href="#dashboard" class="list-group-item list-group-item-action">Dashboard</a>
+        <a href="#pagos" class="list-group-item list-group-item-action">Mis pagos</a>
+        <a href="#comprobante" class="list-group-item list-group-item-action">Subir comprobante</a>
+        <a href="#reportes" class="list-group-item list-group-item-action">Reportes</a>
+        <a href="#anuncios" class="list-group-item list-group-item-action">Anuncios</a>
+        <a href="#cuenta" class="list-group-item list-group-item-action">Mi cuenta</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9">
+
+    <div class="card mb-4" id="inicio">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-login me-2 text-green"></i>Inicio de sesión</h3></div>
+      <div class="card-body">
+        <p>Accede al sistema con el correo electrónico y la contraseña que configuraste al aceptar la invitación.</p>
+        <h4>¿Olvidaste tu contraseña?</h4>
+        <p>Contacta al personal administrativo del edificio para que te envíen una nueva invitación o restablezcan tu acceso.</p>
+        <h4 class="mt-3">Primer acceso</h4>
+        <p>Recibirás un correo con un enlace de invitación. Al hacer clic:</p>
+        <ol>
+          <li>Ingresa tu nombre, apellido y una contraseña segura.</li>
+          <li>Tu cuenta quedará vinculada automáticamente a tu apartamento.</li>
+          <li>Si ya tenías cuenta, el apartamento se añade sin necesidad de crear una nueva.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="dashboard">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-layout-dashboard me-2 text-green"></i>Dashboard</h3></div>
+      <div class="card-body">
+        <p>Al ingresar verás un resumen con la información más relevante para ti:</p>
+        <ul>
+          <li>Reportes de incidencias abiertos.</li>
+          <li>Pagos pendientes de tu apartamento.</li>
+          <li>Anuncios recientes del edificio.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="pagos">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-cash me-2 text-green"></i>Mis pagos</h3></div>
+      <div class="card-body">
+        <p>En la sección <strong>Pagos</strong> del menú encontrarás dos secciones:</p>
+        <ul>
+          <li><strong>Mis pagos</strong> — los pagos de mantenimiento de tu apartamento.</li>
+          <li><strong>Todos los pagos</strong> — historial general (solo lectura).</li>
+        </ul>
+        <h4 class="mt-3">Estados de un pago</h4>
+        <ul>
+          <li><span class="badge bg-warning-lt">Pendiente</span> — el pago está por vencer o aún no has subido tu comprobante.</li>
+          <li><span class="badge bg-danger-lt">Vencido</span> — la fecha límite pasó sin registrar el pago.</li>
+          <li><span class="badge bg-blue-lt">En revisión</span> — subiste tu comprobante y está siendo revisado por el staff.</li>
+          <li><span class="badge bg-success-lt">Pagado</span> — el pago fue confirmado por el personal administrativo.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="comprobante">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-upload me-2 text-green"></i>Subir comprobante de pago</h3></div>
+      <div class="card-body">
+        <p>Cuando hayas realizado tu pago de mantenimiento, registra el comprobante así:</p>
+        <ol>
+          <li>Ve a <strong>Pagos</strong> en el menú.</li>
+          <li>En la sección <em>Mis pagos</em>, localiza el pago con estado <em>Pendiente</em> o <em>Vencido</em>.</li>
+          <li>Haz clic en el ícono <i class="ti ti-upload"></i> (subir comprobante).</li>
+          <li>Ingresa la fecha de pago, el número de referencia y adjunta la imagen o PDF de tu comprobante.</li>
+          <li>Guarda. El pago pasará a estado <em>En revisión</em>.</li>
+        </ol>
+        <div class="alert alert-success">
+          <i class="ti ti-check me-2"></i>Recibirás una notificación por correo cuando el personal confirme tu pago.
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="reportes">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-alert-circle me-2 text-green"></i>Reportes de incidencias</h3></div>
+      <div class="card-body">
+        <p>Usa esta sección para reportar problemas o fallas en tu apartamento o en las áreas comunes del edificio.</p>
+        <h4>Crear un reporte</h4>
+        <ol>
+          <li>Ve a <strong>Reportes</strong> en el menú y haz clic en <em>Nuevo reporte</em>.</li>
+          <li>Escribe un título descriptivo y una descripción detallada del problema.</li>
+          <li>Selecciona la categoría (plomería, eléctrico, elevador, etc.) y la prioridad.</li>
+          <li>Opcionalmente adjunta una foto.</li>
+          <li>Envía el reporte. El personal del edificio recibirá una notificación.</li>
+        </ol>
+        <h4 class="mt-3">Seguimiento</h4>
+        <p>Desde <em>Mis reportes</em> (parte superior de la lista) puedes ver el estado actual de tus reportes y el historial de notas del personal.</p>
+        <h4 class="mt-3">Cerrar un reporte</h4>
+        <p>Si el problema ya fue resuelto a tu satisfacción, puedes cambiar el estado a <strong>Cerrado</strong> desde el formulario de edición de tu reporte.</p>
+        <div class="alert alert-info">
+          <i class="ti ti-info-circle me-2"></i>Recibirás notificaciones por correo cada vez que el personal actualice el estado de tu reporte.
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="anuncios">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-speakerphone me-2 text-green"></i>Anuncios</h3></div>
+      <div class="card-body">
+        <p>En la sección <strong>Anuncios</strong> encontrarás comunicados importantes del edificio como avisos de mantenimiento, asambleas o recordatorios.</p>
+        <ul>
+          <li>Los anuncios urgentes aparecen destacados en rojo.</li>
+          <li>Los anuncios más recientes también se muestran en el Dashboard.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="cuenta">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-user me-2 text-green"></i>Mi cuenta</h3></div>
+      <div class="card-body">
+        <p>Accede a tu perfil desde el menú superior derecho → <strong>Mi cuenta</strong>.</p>
+        <h4>Pestaña Perfil</h4>
+        <ul>
+          <li>Edita tu nombre y correo electrónico. Al cambiar el correo recibirás una notificación de confirmación.</li>
+          <li>Actualiza tu <strong>contacto de emergencia</strong> (nombre y teléfono) y notas adicionales.</li>
+        </ul>
+        <h4 class="mt-3">Pestaña Contraseña</h4>
+        <ul>
+          <li>Cambia tu contraseña ingresando la actual y la nueva dos veces.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

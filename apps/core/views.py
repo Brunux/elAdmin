@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
+from apps.core.decorators import admin_required
 
 
 def login_view(request):
@@ -113,3 +114,23 @@ def account(request):
         'password_form': password_form,
         'active_tab': 'password' if password_saved else 'profile',
     })
+
+
+@login_required
+def manual_index(request):
+    return render(request, 'core/manual_index.html')
+
+
+@login_required
+def manual_admin(request):
+    return render(request, 'core/manual_admin.html')
+
+
+@login_required
+def manual_staff(request):
+    return render(request, 'core/manual_staff.html')
+
+
+@login_required
+def manual_resident(request):
+    return render(request, 'core/manual_resident.html')
