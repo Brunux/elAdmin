@@ -48,7 +48,7 @@ class ResidentProfileForm(TablerFormMixin, forms.ModelForm):
     class Meta:
         model = Resident
         fields = [
-            'phone', 'resident_type', 'apartments',
+            'phone', 'resident_type', 'status', 'apartments',
             'move_in_date', 'move_out_date', 'photo',
             'emergency_contact_name', 'emergency_contact_phone', 'notes',
         ]
